@@ -1,0 +1,41 @@
+mod PEG-SOLITAIRE-FIJA is
+    protecting NAT .
+    sorts Ficha ListFicha ListListFicha .
+    subsort Ficha < ListFicha < ListListFicha .
+    ops o free : -> Ficha .
+    op count : ListFicha -> Nat .
+    op count : ListListFicha -> Nat . 
+    op nil : -> ListFicha .
+    op _ _ : ListFicha ListFicha -> ListFicha [assoc id: nil] .
+    op nilL : -> ListListFicha .
+    op _ , _ : ListListFicha ListListFicha -> ListListFicha [assoc id: nil] .
+
+    ***count una sobre listas y otra sobre listas de listas
+
+    op initial : -> ListListFicha .
+    eq initial = (
+        (o o o o ) ,
+        (o o o o ) ,
+        (o o free o ) ,
+        (o o o o )
+    ) . 
+    *** Reglas de movimiento
+    vars f11 f21 f31 f12 f22 f32 : ListFicha .
+    rl [moveToRight] : o o free => free free o .
+    rl [moveToLeft] : free o o => o free free .
+    rl [moveToDown] : ((f11 o f12) ,
+                    (f21 o f22) ,
+                    (f31 free f32))
+                 => 
+                    ((f11 free f12) ,
+                    (f21 free f22) ,
+                    (f31 o f32 )) .
+    rl [moveToUp] : ((f11 free f12) ,
+                     (f21 o f22) ,
+                     (f31 o f32)) 
+                    => 
+                    ((f11 o f12) ,
+                    (f21 free f22) ,
+                    (f31 free f32)) .
+
+endm
