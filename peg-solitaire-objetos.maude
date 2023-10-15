@@ -1,0 +1,26 @@
+mod PEG-SOLITAIRE-OBJETOS is
+    sort Casilla Tablero .
+    subsort Casilla < Tablero .
+
+    ***Creación casilla con ficha y casilla vacía
+    op o: Nat Nat -> Casilla [ctor] .
+    op x: Nat Nat -> Casilla [ctor] .
+
+    var T : Tablero .
+    vars M N : Nat .
+
+    ***Para saber si el juego ha terminado, se cuenta el número de fichas en el tablero.
+    ***Si tan solo hay una ficha en el tablero, se habrá encontrado una solución
+
+    op contarFichas : Tablero -> Nat .
+    eq contarFichas x(M,N) = 0 .
+    eq contarFichas o(M,N) = 1 .
+
+    ***Reglas
+
+    r1 [derecha] : o(M,N) o(M, s N) x(M, s s N) -> x(M,N) x(M, s N) o(M, s s N) .
+    r1 [izquierda] : x(M,N) o(M, s N) o(M, s s N) -> o(M,N) x(M, s N) x(M, s s N) .
+    r1 [abajo] : o(M,N) o(s M, N) x(s s M, N) -> x(M,N) x(s M, N) o(s s M, N) .
+    r1 [arriba] : x(M,N) o(s M, N) o(s s M, N) -> o(M,N) x(s M, N) x(s s M, N) .
+
+    endm
