@@ -1,26 +1,42 @@
+load prelude.maude
+
 mod PEG-SOLITAIRE-OBJETOS is
+    protecting NAT .
+
     sort Casilla Tablero .
     subsort Casilla < Tablero .
 
     ***Creación casilla con ficha y casilla vacía
-    op o: Nat Nat -> Casilla [ctor] .
-    op x: Nat Nat -> Casilla [ctor] .
+    op __ : Tablero Tablero -> Tablero [assoc comm ctor] .
+    op o : Nat Nat -> Casilla [ctor] .
+    op x : Nat Nat -> Casilla [ctor] .
 
-    var T : Tablero .
+    vars T1 T2 : Tablero .
     vars M N : Nat .
 
     ***Para saber si el juego ha terminado, se cuenta el número de fichas en el tablero.
     ***Si tan solo hay una ficha en el tablero, se habrá encontrado una solución
 
     op contarFichas : Tablero -> Nat .
-    eq contarFichas x(M,N) = 0 .
-    eq contarFichas o(M,N) = 1 .
+    eq contarFichas (o(M,N)) = 1 .
+    eq contarFichas (x(M,N)) = 0 .
+    eq contarFichas (T1 T2) = contarFichas(T1) + contarFichas(T2) .
+
+    op cuatroXcuatro : -> Tablero .
+    eq cuatroXcuatro =  o(0,0) o(0,1) o(0,2) o(0,3)
+                        o(1,0) o(1,1) o(1,2) o(1,3)
+                        o(2,0) o(2,1) o(2,2) x(2,3)
+                        o(3,0) o(3,1) o(3,2) o(3,3) .
 
     ***Reglas
 
-    r1 [derecha] : o(M,N) o(M, s N) x(M, s s N) -> x(M,N) x(M, s N) o(M, s s N) .
-    r1 [izquierda] : x(M,N) o(M, s N) o(M, s s N) -> o(M,N) x(M, s N) x(M, s s N) .
-    r1 [abajo] : o(M,N) o(s M, N) x(s s M, N) -> x(M,N) x(s M, N) o(s s M, N) .
-    r1 [arriba] : x(M,N) o(s M, N) o(s s M, N) -> o(M,N) x(s M, N) x(s s M, N) .
+    rl [derecha] : o(M,N) o(M, s N) x(M, s s N) => x(M,N) x(M, s N) o(M, s s N) .
+    rl [izquierda] : x(M,N) o(M, s N) o(M, s s N) => o(M,N) x(M, s N) x(M, s s N) .
+    rl [abajo] : o(M,N) o(s M, N) x(s s M, N) => x(M,N) x(s M, N) o(s s M, N) .
+    rl [arriba] : x(M,N) o(s M, N) o(s s M, N) => o(M,N) x(s M, N) x(s s M, N) .
 
     endm
+
+    
+
+    search in PEG-SOLITAIRE-OBJETOS : cuatroXcuatro =>* T1 such that contarFichas(T1) = 1 .
