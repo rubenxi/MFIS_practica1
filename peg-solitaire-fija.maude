@@ -1,41 +1,67 @@
+load prelude.maude
+
 mod PEG-SOLITAIRE-FIJA is
     protecting NAT .
-    sorts Ficha ListFicha ListListFicha .
-    subsort Ficha < ListFicha < ListListFicha .
-    ops o free : -> Ficha .
-    op count : ListFicha -> Nat .
-    op count : ListListFicha -> Nat . 
-    op nil : -> ListFicha .
-    op _ _ : ListFicha ListFicha -> ListFicha [assoc id: nil] .
-    op nilL : -> ListListFicha .
-    op _ , _ : ListListFicha ListListFicha -> ListListFicha [assoc id: nil] .
 
-    ***count una sobre listas y otra sobre listas de listas
+    sorts Ficha ListFicha Board .
+    subsort Ficha < ListFicha < Board .
 
-    op initial : -> ListListFicha .
+    op nil : -> ListFicha [ctor] .
+
+    op __ : ListFicha ListFicha -> ListFicha [assoc id: nil] .
+    op _,_ : Board Board -> Board [assoc] .
+    op o : -> Ficha [ctor].
+    op free : -> Ficha [ctor].
+    op f : -> Board . 
+    var ficha : Ficha .
+    var listaFichas : ListFicha .
+    var tablero : Board .
+    op countList : ListFicha -> Nat .
+    eq countList (ficha) = if ficha == o then 1 else 0 fi .
+    eq countList (ficha listaFichas) = countList (ficha) + countList (listaFichas) .
+    op count : Board -> Nat .
+    eq count (listaFichas) = countList (listaFichas) .
+    eq count (listaFichas, tablero) = countList(listaFichas) + count(tablero) .
+
+    op size : ListFicha -> Nat .
+    eq size (ficha) = 1 .
+    eq size (ficha listaFichas) = s size(listaFichas) .
+    op initial : -> Board .
     eq initial = (
-        (o o o o ) ,
-        (o o o o ) ,
-        (o o free o ) ,
-        (o o o o )
+        (o o o o) ,
+        (o o o o) ,
+        (o o o free) ,
+        (o o o o)
     ) . 
-    *** Reglas de movimiento
+    op four : -> Board .
+    eq four = (
+        (o o o o) ,
+        (o o o o) ,
+        (o o o free) ,
+        (o o o o)
+    ) .
     vars f11 f21 f31 f12 f22 f32 : ListFicha .
     rl [moveToRight] : o o free => free free o .
     rl [moveToLeft] : free o o => o free free .
-    rl [moveToDown] : ((f11 o f12) ,
-                    (f21 o f22) ,
-                    (f31 free f32))
-                 => 
-                    ((f11 free f12) ,
-                    (f21 free f22) ,
-                    (f31 o f32 )) .
-    rl [moveToUp] : ((f11 free f12) ,
-                     (f21 o f22) ,
-                     (f31 o f32)) 
-                    => 
-                    ((f11 o f12) ,
-                    (f21 free f22) ,
-                    (f31 free f32)) .
-
+    crl [moveToDown] : 
+    (f11 o f12) ,
+    (f21 o f22) ,
+    (f31 free f32)
+    => 
+    (f11 free f12) ,
+    (f21 free f22) ,
+    (f31 o f32 )
+    if size(f11) == size(f21) /\ size(f21) == size(f31) .
+    crl [moveToUp] : 
+    (f11 free f12) ,
+    (f21 o f22) ,
+    (f31 o f32)
+    => 
+    (f11 o f12) ,
+    (f21 free f22) ,
+    (f31 free f32)
+    if size(f11) == size(f21) /\ size(f21) == size(f31) .
 endm
+eof
+
+ search in PEG-SOLITAIRE-FIJA : four =>* tablero such that count(tablero) = 1 .
