@@ -3,47 +3,46 @@ load prelude.maude
 mod PEG-SOLITAIRE-FIJA is
     protecting NAT .
 
-    sorts Ficha ListFicha Board .
-    subsort Ficha < ListFicha < Board .
+    sorts Ficha ListFicha Tablero .
+    subsort Ficha < ListFicha < Tablero .
 
     op nil : -> ListFicha [ctor] .
-
+    op nilL : -> Tablero [ctor] .
     op __ : ListFicha ListFicha -> ListFicha [assoc id: nil] .
-    op _,_ : Board Board -> Board [assoc] .
+    op _,_ : Tablero Tablero -> Tablero [assoc id: nilL] .
     op o : -> Ficha [ctor].
     op free : -> Ficha [ctor].
-    op f : -> Board . 
     var ficha : Ficha .
     var listaFichas : ListFicha .
-    var tablero : Board .
+    var tablero : Tablero .
     op countList : ListFicha -> Nat .
     eq countList (ficha) = if ficha == o then 1 else 0 fi .
     eq countList (ficha listaFichas) = countList (ficha) + countList (listaFichas) .
-    op count : Board -> Nat .
-    eq count (listaFichas) = countList (listaFichas) .
-    eq count (listaFichas, tablero) = countList(listaFichas) + count(tablero) .
+    op contarFichas : Tablero -> Nat .
+    eq contarFichas (listaFichas) = countList (listaFichas) .
+    eq contarFichas (listaFichas, tablero) = countList(listaFichas) + count(tablero) .
 
     op size : ListFicha -> Nat .
     eq size (ficha) = 1 .
     eq size (ficha listaFichas) = s size(listaFichas) .
-    op initial : -> Board .
-    eq initial = (
+    op inicial : -> Tablero .
+    eq inicial = (
         (o o o o) ,
         (o o o o) ,
         (o o o free) ,
         (o o o o)
     ) . 
-    op four : -> Board .
-    eq four = (
+    op cuatro : -> Tablero .
+    eq cuatro = (
         (o o o o) ,
         (o o o o) ,
         (o o o free) ,
         (o o o o)
     ) .
     vars f11 f21 f31 f12 f22 f32 : ListFicha .
-    rl [moveToRight] : o o free => free free o .
-    rl [moveToLeft] : free o o => o free free .
-    crl [moveToDown] : 
+    rl [derecha] : o o free => free free o .
+    rl [izquierda] : free o o => o free free .
+    crl [abajo] : 
     (f11 o f12) ,
     (f21 o f22) ,
     (f31 free f32)
@@ -52,7 +51,7 @@ mod PEG-SOLITAIRE-FIJA is
     (f21 free f22) ,
     (f31 o f32 )
     if size(f11) == size(f21) /\ size(f21) == size(f31) .
-    crl [moveToUp] : 
+    crl [arriba] : 
     (f11 free f12) ,
     (f21 o f22) ,
     (f31 o f32)
