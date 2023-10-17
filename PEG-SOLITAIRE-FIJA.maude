@@ -1,8 +1,0 @@
-mod PEG-SOLITAIRE-FIJA is
-    sort Ficha ListFicha ListListFicha .
-    subsort Ficha < ListFicha < ListListFicha .
-    op nil : -> ListFicha .
-    op _ _ : ListFicha ListFicha -> ListFicha [assoc id: nil] .
-    op nil : -> ListListFicha .
-    op _ , _ : ListListFicha ListListFicha -> ListListFicha [assoc id: nil] .
-endm
