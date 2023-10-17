@@ -15,12 +15,12 @@ mod PEG-SOLITAIRE-FIJA is
     var ficha : Ficha .
     var listaFichas : ListFicha .
     var tablero : Tablero .
-    op countList : ListFicha -> Nat .
-    eq countList (ficha) = if ficha == o then 1 else 0 fi .
-    eq countList (ficha listaFichas) = countList (ficha) + countList (listaFichas) .
+    op contarLista : ListFicha -> Nat .
+    eq contarLista (ficha) = if ficha == o then 1 else 0 fi .
+    eq contarLista (ficha listaFichas) = contarLista (ficha) + contarLista(listaFichas) .
     op contarFichas : Tablero -> Nat .
-    eq contarFichas (listaFichas) = countList (listaFichas) .
-    eq contarFichas (listaFichas, tablero) = countList(listaFichas) + count(tablero) .
+    eq contarFichas (listaFichas) = contarLista (listaFichas) .
+    eq contarFichas (listaFichas, tablero) = contarLista(listaFichas) + contarFichas(tablero) .
 
     op size : ListFicha -> Nat .
     eq size (ficha) = 1 .
@@ -61,6 +61,6 @@ mod PEG-SOLITAIRE-FIJA is
     (f31 free f32)
     if size(f11) == size(f21) /\ size(f21) == size(f31) .
 endm
-eof
 
- search in PEG-SOLITAIRE-FIJA : four =>* tablero such that count(tablero) = 1 .
+
+ search in PEG-SOLITAIRE-FIJA : cuatro =>* tablero such that contarFichas(tablero) = 1 .
