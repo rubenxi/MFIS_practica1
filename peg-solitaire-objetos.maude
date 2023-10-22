@@ -23,10 +23,30 @@ mod PEG-SOLITAIRE-OBJETOS is
     eq contarFichas (T1 T2) = contarFichas(T1) + contarFichas(T2) .
 
     op cuatro : -> Tablero .
-    eq cuatro =  o(0,0) o(0,1) o(0,2) o(0,3)
+    eq cuatro =         o(0,0) o(0,1) o(0,2) o(0,3)
                         o(1,0) o(1,1) o(1,2) o(1,3)
-                        o(2,0) o(2,1) o(2,2) free(2,3)
+                        o(2,0) o(2,1) o(2,2) o(2,3)
+                        o(3,0) o(3,1) free(3,2) o(3,3) .
+
+    op cuatro22 : -> Tablero .
+    eq cuatro22 =        o(0,0) o(0,1) o(0,2) o(0,3)
+                        o(1,0) o(1,1) o(1,2) o(1,3)
+                        o(2,0) o(2,1) free(2,2) o(2,3)
                         o(3,0) o(3,1) o(3,2) o(3,3) .
+
+    op cuatro33 : -> Tablero .
+    eq cuatro33 =       o(0,0) o(0,1) o(0,2) o(0,3)
+                        o(1,0) o(1,1) o(1,2) o(1,3)
+                        o(2,0) o(2,1) o(2,2) o(2,3)
+                        o(3,0) o(3,1) o(3,2) free(3,3) .
+
+    op cinco : -> Tablero .
+    eq cinco =          o(0,0) o(0,1) o(0,2) o(0,3) o(0,4)
+                        o(1,0) o(1,1) o(1,2) o(1,3) o(1,4)
+                        o(2,0) o(2,1) o(2,2) free(2,3) o(2,4)
+                        o(3,0) o(3,1) o(3,2) o(3,3) o(3,4) 
+                        o(4,0) o(4,1) o(4,2) o(4,3) o(4,4) .
+
 
     ***Reglas
 
