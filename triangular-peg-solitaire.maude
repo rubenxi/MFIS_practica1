@@ -3,8 +3,8 @@ mod TRIANGULAR-PEG-SOLITAIRE is
 extending PEG-SOLITAIRE-OBJETOS .
 vars B : Tablero .
 vars F C : Nat .
-rl [upRight] : o(s s F, C) o(s F, s C) free(F, s s C) => free(s s F, C) free(s F, s C) o(F, s s C) .
-rl [downLeft] : free(s s F, C) o(s F, s C) o(F, s s C) => o(s s F, C) free(s F, s C) free(F, s s C) .
+rl [arribaDerecha] : o(s s F, C) o(s F, s C) free(F, s s C) => free(s s F, C) free(s F, s C) o(F, s s C) .
+rl [abajoIzquierda] : free(s s F, C) o(s F, s C) o(F, s s C) => o(s s F, C) free(s F, s C) free(F, s s C) .
 
 op triangular : -> Tablero .
 eq triangular = free(0,0) o(0,1) o(0,2) o(0,3) o(0,4)
