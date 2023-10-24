@@ -1,0 +1,24 @@
+fth NAT* is
+    protecting NAT .
+    op k : -> NzNat .
+endfth
+
+fmod NAT/{k :: NAT*} is
+    sort Nat/{k} .
+    op [_] : Nat -> Nat/{k} .
+    var N : Nat .
+    ceq [N] = [sd(N, k)] if N >= k .
+endfm
+
+mod DINING-PHILOSOPHERS{P :: NAT*}
+    op philosopher : Nat/{P} Status Nat -> Philosopher .
+    op chopstick : Nat/{P} -> Chopstick .
+endm
+
+view 5 from NAT* to INT is
+    op k to term 5 .
+endv
+
+mod DINING-PHILOSOPHERS-5 is
+    pr DINING-PHILOSOPHERS{5} .
+endm

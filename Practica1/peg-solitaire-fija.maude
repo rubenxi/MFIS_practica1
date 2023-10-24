@@ -1,0 +1,66 @@
+load prelude.maude
+
+mod PEG-SOLITAIRE-FIJA is
+    protecting NAT .
+
+    sorts Ficha ListFicha Tablero .
+    subsort Ficha < ListFicha < Tablero .
+
+    op nil : -> ListFicha [ctor] .
+    op nilL : -> Tablero [ctor] .
+    op __ : ListFicha ListFicha -> ListFicha [assoc id: nil] .
+    op _,_ : Tablero Tablero -> Tablero [assoc id: nilL] .
+    op o : -> Ficha [ctor].
+    op free : -> Ficha [ctor].
+    var ficha : Ficha .
+    var listaFichas : ListFicha .
+    var tablero : Tablero .
+    op contarLista : ListFicha -> Nat .
+    eq contarLista (ficha) = if ficha == o then 1 else 0 fi .
+    eq contarLista (ficha listaFichas) = contarLista (ficha) + contarLista(listaFichas) .
+    op contarFichas : Tablero -> Nat .
+    eq contarFichas (listaFichas) = contarLista (listaFichas) .
+    eq contarFichas (listaFichas, tablero) = contarLista(listaFichas) + contarFichas(tablero) .
+
+    op size : ListFicha -> Nat .
+    eq size (ficha) = 1 .
+    eq size (ficha listaFichas) = s size(listaFichas) .
+    op inicial : -> Tablero .
+    eq inicial = (
+        (o o o o) ,
+        (o o o o) ,
+        (o o o free) ,
+        (o o o o)
+    ) . 
+    op cuatro : -> Tablero .
+    eq cuatro = (
+        (o o o o) ,
+        (o o o o) ,
+        (o o o free) ,
+        (o o o o)
+    ) .
+    vars f11 f21 f31 f12 f22 f32 : ListFicha .
+    rl [derecha] : o o free => free free o .
+    rl [izquierda] : free o o => o free free .
+    crl [abajo] : 
+    (f11 o f12) ,
+    (f21 o f22) ,
+    (f31 free f32)
+    => 
+    (f11 free f12) ,
+    (f21 free f22) ,
+    (f31 o f32 )
+    if size(f11) == size(f21) /\ size(f21) == size(f31) .
+    crl [arriba] : 
+    (f11 free f12) ,
+    (f21 o f22) ,
+    (f31 o f32)
+    => 
+    (f11 o f12) ,
+    (f21 free f22) ,
+    (f31 free f32)
+    if size(f11) == size(f21) /\ size(f21) == size(f31) .
+endm
+
+
+ search in PEG-SOLITAIRE-FIJA : cuatro =>* tablero such that contarFichas(tablero) = 1 .
