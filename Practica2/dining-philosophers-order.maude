@@ -1,4 +1,5 @@
 load model-checker.maude
+load prelude.maude
 
 fth NAT* is
 protecting NAT .
@@ -10,6 +11,10 @@ sort Nat/{k} .
 op [_] : Nat -> Nat/{k} .
 var N : Nat .
 ceq [N] = [sd(N, k)] if N >= k .
+
+var M : Nat .
+op _<_ : Nat/{k} Nat/{k} -> Bool .
+ceq [N] < [M] = true if sd(N, k) < sd(M, k) .
 endfm
 
 mod DINING-PHILOSOPHERS{P :: NAT*} is
@@ -40,9 +45,9 @@ eq initState (s K) = chopstick([K]) philosopher([K], thinking, 0)  (initState(K)
 
 rl [get-hungry] : philosopher([P1], thinking, N) => philosopher([P1], hungry, N) .
 crl [grab-stick] : chopstick([C]) philosopher([P1], hungry, 0) => philosopher([P1], hungry, 1) 
-if ([C] == [P1] and [N < s N]) or ([C] == [s P1] and [s N < N]) .
+if ([C] == [P1] and [P1] < [s P1]) or ([C] == [s P1] and [s P1] < [P1]) .
 crl [grab-stick] : chopstick([C]) philosopher([P1], hungry, 1) => philosopher([P1], hungry, 2) 
-if ([C] == [s P1] and [N < s N]) or ([C] == [s P1] and [s N < N]) .
+if ([C] == [s P1] and [P1] < [s P1]) or ([C] == [s P1] and [s P1] < [P1]) .
 rl [eat] : philosopher([P1], hungry, 2) => philosopher([P1], eating, 2) .
 rl [think] : philosopher([P1], eating, 2) => philosopher([P1], thinking, 0) .
 
