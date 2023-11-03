@@ -5,9 +5,8 @@ pensando. Para poder comer, necesitan coger los dos palillos junto a su plato.
 
 El problema surge porque estos palillos son recursos compartidos: el palillo que queda a la derecha de un filósofo es el palillo a la izquierda de su vecino de la derecha.
 
-![Filósofos cenando](image.png)
-
-Figura 1: Filósofos cenando
+![Filósofos cenando](image.png)  
+**Figura 1:** Filósofos cenando
 
 ## Ejercicio 1: Especificación del problema de los filósofos
 Especifica el problema de los filósofos como una teoría de reescritura en Maude en un fichero **dining-philosophers.maude** siguiendo las siguientes indicaciones.
@@ -70,37 +69,110 @@ utilizamos la sintaxis op OP to term TERM ., para interpretar k como 5 como sigu
     endm
 
 ### [ Q1 ] 
-¿Es la teoría de reescritura terminante? ¿Es coherente? ¿Es el espacio de búsqueda alcanzable a
-partir de initState finito? Justifica tu respuesta. Prueba a utilizar el comando reduce y el comando
-rewrite para reescribir el término initState usando ecuaciones, y ecuaciones y reglas, respectivamente.
-### [ Q2 ] 
-Utiliza el comando search para buscar un estado de bloqueo. Utiliza los comandos **show path y show path labels** para conocer la secuencia de pasos seguida hasta dicho estado de bloqueo.
+**¿Es la teoría de reescritura terminante? ¿Es coherente? ¿Es el espacio de búsqueda alcanzable a partir de initState finito? Justifica tu respuesta. Prueba a utilizar el comando reduce y el comando rewrite para reescribir el término initState usando ecuaciones, y ecuaciones y reglas, respectivamente.**
 
-- Crea un módulo DINING-PHILOSOPHERS-PREDS{P :: NAT*} que importe el módulo
-DINING-PHILOSOPHERS{P} y defina proposiciones atómicas
+La teoría de reescritura no es terminante. Las reglas se van a estar aplicando, y consecuentemente reescribiendo, constantemente para cada filósofo, siendo de esta forma no terminante. 
+Como ejemplo, un filósofo puede pasar del estado thinking a hungry con la regla get-hungry. Con la regla grab-stick estará preparado para empezar a comer. Con la regla eat pasará al estado eating. Y por último con la regla think volverá al estado thinking, volviendo al estado inicial, donde se repetiría el bucle.
+
+Las reglas son coherentes, ya que la parte izquierda de estas están simplificadas.
+
+El espacio de búsqueda alcanzable es finito, para comprobar esto ejecutamos search in DINING-PHILOSOPHERS-5-CHECK : initState(5) =>* c:Configuration .
+Ejecutando esta línea vemos que se encuentra un número de soluciones finitas.
+
+Solution 4123 (state 4122)
+states: 4123  rewrites: 215277 in 4859ms cpu (20772ms real) (44301 rewrites/second)
+c:Configuration --> philosopher([0], hungry, 1) philosopher([1], hungry, 0) philosopher([2], hungry, 0) philosopher([
+    3], hungry, 0) philosopher([4], hungry, 0)
+
+No more solutions.
+states: 4123  rewrites: 215433 in 4859ms cpu (20776ms real) (44333 rewrites/second)
+
+
+Maude> rewrite initState(5) .
+rewrite in DINING-PHILOSOPHERS-5-CHECK : initState(5) .
+rewrites: 254 in 0ms cpu (0ms real) (~ rewrites/second)
+result Configuration: philosopher([0], hungry, 0) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([
+    3], hungry, 1) philosopher([4], hungry, 0)
+
+Maude> red initState(5) .
+reduce in DINING-PHILOSOPHERS-5-CHECK : initState(5) .
+rewrites: 11 in 0ms cpu (0ms real) (~ rewrites/second)
+result Configuration: chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0],
+    thinking, 0) philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher(
+    [4], thinking, 0)
+
+### [ Q2 ] 
+**Utiliza el comando search para buscar un estado de bloqueo. Utiliza los comandos show path y show path labels para conocer la secuencia de pasos seguida hasta dicho estado de bloqueo.**
+
+- **Crea un módulo DINING-PHILOSOPHERS-PREDS{P :: NAT * } que importe el módulo DINING-PHILOSOPHERS{P} y defina proposiciones atómicas**
 
     op phil-status : Nat/{P} Status -> Prop .  
     op phil-sticks : Nat/{P} Nat -> Prop .
 
-    que se satisfagan si el filósofo con el identificador dado como primer argumento está en el estado indicado como segundo argumento o tiene el número de palillos indicado, respectivamente.
+    **que se satisfagan si el filósofo con el identificador dado como primer argumento está en el estado indicado como segundo argumento o tiene el número de palillos indicado, respectivamente.**
 
-- Crea un módulo DINING-PHILOSOPHERS-5-CHECK con el que poder comprobar propiedades con
-el comprobador de modelos para 5 filósofos.
+- **Crea un módulo DINING-PHILOSOPHERS-5-CHECK con el que poder comprobar propiedades con el comprobador de modelos para 5 filósofos.**
+
+Se usa el siguiente comando:
+
+Maude> search [1, 1000] in DINING-PHILOSOPHERS-5-CHECK : initState(5) =>! c:Configuration .
+
+El estado de bloqueo encontrado es:
+
+Solution 1 (state 2708)
+states: 3267  rewrites: 174868 in 57ms cpu (56ms real) (3067859
+	rewrites/second)
+c:Configuration --> philosopher([0], hungry, 1) philosopher([1], hungry, 1)
+	philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4],
+	hungry, 1)
+
 
 ### [ Q3 ] 
-Utiliza el comprobador de modelos de Maude para encontrar un camino hasta el estado de bloqueo.
-Como conocemos el estado de bloqueo (cada filósofo tiene un palillo), podemos encontrarlo verificando
-2
-la propiedad temporal que niega la existencia de dicho estado: siempre es verdad que no tenemos un
-estado de bloqueo.
+**Utiliza el comprobador de modelos de Maude para encontrar un camino hasta el estado de bloqueo. Como conocemos el estado de bloqueo (cada filósofo tiene un palillo), podemos encontrarlo verificando la propiedad temporal que niega la existencia de dicho estado: siempre es verdad que no tenemos un estado de bloqueo.**
+
+Ejecutando el siguiente comando conseguimos el camino hasta el estado de bloqueo.
+
+Maude> red modelCheck(initState(5), [] ~(phil-sticks([0],1) /\ phil-sticks([1],1) /\ phil-sticks([2],1) /\ phil-sticks([3],1) /\ phil-sticks([4],1))) .
+
+reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState(5), []~ (phil-sticks([4], 1) /\ (
+    phil-sticks([3], 1) /\ (phil-sticks([2], 1) /\ (phil-sticks([0], 1) /\ phil-sticks([1], 1)))))) .  
+rewrites: 39667 in 15ms cpu (15ms real) (2538688 rewrites/second)  
+result ModelCheckResult: counterexample({chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4])
+    philosopher([0], thinking, 0) philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3],
+    thinking, 0) philosopher([4], thinking, 0),'get-hungry} {chopstick([0]) chopstick([1]) chopstick([2]) chopstick([
+    3]) chopstick([4]) philosopher([0], hungry, 0) philosopher([1], thinking, 0) philosopher([2], thinking, 0)
+    philosopher([3], thinking, 0) philosopher([4], thinking, 0),'grab-stick} {chopstick([1]) chopstick([2]) chopstick([
+    3]) chopstick([4]) philosopher([0], hungry, 1) philosopher([1], thinking, 0) philosopher([2], thinking, 0)
+    philosopher([3], thinking, 0) philosopher([4], thinking, 0),'get-hungry} {chopstick([1]) chopstick([2]) chopstick([
+    3]) chopstick([4]) philosopher([0], hungry, 1) philosopher([1], hungry, 0) philosopher([2], thinking, 0)
+    philosopher([3], thinking, 0) philosopher([4], thinking, 0),'grab-stick} {chopstick([2]) chopstick([3]) chopstick([
+    4]) philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], thinking, 0) philosopher([3],
+    thinking, 0) philosopher([4], thinking, 0),'get-hungry} {chopstick([2]) chopstick([3]) chopstick([4]) philosopher([
+    0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 0) philosopher([3], thinking, 0) philosopher([
+    4], thinking, 0),'grab-stick} {chopstick([3]) chopstick([4]) philosopher([0], hungry, 1) philosopher([1], hungry,
+    1) philosopher([2], hungry, 1) philosopher([3], thinking, 0) philosopher([4], thinking, 0),'get-hungry} {chopstick(
+    [3]) chopstick([4]) philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1)
+    philosopher([3], hungry, 0) philosopher([4], thinking, 0),'grab-stick} {chopstick([4]) philosopher([0], hungry, 1)
+    philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], thinking, 0),
+    'get-hungry} {chopstick([4]) philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1)
+    philosopher([3], hungry, 1) philosopher([4], hungry, 0),'grab-stick}, {philosopher([0], hungry, 1) philosopher([1],
+    hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1),deadlock})
 
 ### [ Q4 ] 
-Analiza el formato del contraejemplo devuelto como resultado y proporciona la secuencia de los
-10 primeros pasos con el siguiente formato: el filósofo 1 coge el palillo 1, el filósofo 1 suelta el palillo 1,
-el filósofo 2 coge el palillo 3, . . .
+**Analiza el formato del contraejemplo devuelto como resultado y proporciona la secuencia de los 10 primeros pasos con el siguiente formato: el filósofo 1 coge el palillo 1, el filósofo 1 suelta el palillo 1, el filósofo 2 coge el palillo 3, ...**
 
-Que el sistema pueda bloquearse no es una buena noticia, y se han propuesto varias soluciones para
-este problema. Especifiquemos a continuación tres de ellas.
+**Que el sistema pueda bloquearse no es una buena noticia, y se han propuesto varias soluciones para este problema. Especifiquemos a continuación tres de ellas.**
+
+Filósofo 0 tiene hambre  
+Filósofo 0 coge el palillo 0  
+Filósofo 1 tiene hambre  
+Filósofo 1 coge el palillo 1  
+Filósofo 2 tiene hambre  
+Filósofo 2 coge el palillo 2  
+Filósofo 3 tiene hambre  
+Filósofo 3 coge el palillo 3  
+Filósofo 4 tiene hambre  
+Filósofo 4 coge el palillo 4  
 
 ## Ejercicio 2: Jerarquía de recursos
 Para evitar el problema del bloqueo, Dijstra propuso asignar un orden parcial a los palillos, estableciendo
@@ -113,14 +185,11 @@ intentarían primero coger el palillo 0, rompiendo así el bloqueo.
 Crea una copia del fichero del Ejercicio 1 en un fichero **dining-philosophers-order.maude** y modifícalo de forma que funcione según esta variación.
 
 ### [Q5] 
-Demuestra, utilizando el comando search, que la nueva especificación no tiene bloqueos.
+**Demuestra, utilizando el comando search, que la nueva especificación no tiene bloqueos.**
 ### [Q6] 
-Demuestra, utilizando el comprobador de modelos, que la nueva especificación no tiene bloqueos.
-Esta solución no es justa: Cualquiera de los filósofos puede quedarse sin comer aunque lo desee.
+**Demuestra, utilizando el comprobador de modelos, que la nueva especificación no tiene bloqueos. Esta solución no es justa: Cualquiera de los filósofos puede quedarse sin comer aunque lo desee.**
 ### [Q7] 
-Comprueba, utilizando el comprobador de modelos, que esta especificación no satisface la propiedad
-de viveza débil ni la de viveza fuerte. Es posible que los contraejemplos de la comprobación de las
-propiedades para los distintos filósofos tengan longitudes distintas, ¿por qué?
+**Comprueba, utilizando el comprobador de modelos, que esta especificación no satisface la propiedad de viveza débil ni la de viveza fuerte. Es posible que los contraejemplos de la comprobación de las propiedades para los distintos filósofos tengan longitudes distintas, ¿por qué?**
 
 ## Ejercicio 3: Un gestor de procesos
 Otra solución consiste en limitar el número de comensales sentados a la mesa. Si tenemos una mesa
