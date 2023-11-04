@@ -394,28 +394,15 @@ Como ocurría con el filósofo 1, se nos ha generado un contraejemplo que demues
 Hemos vuelto a recortar el contraejemplo debido a la extensa longitud, dejando lo justo y necesario para ver cómo su longitud varía mucho con la del contraejemplo de viveza fuerte del filósofo 1.
 
 ## Ejercicio 3: Un gestor de procesos
-Otra solución consiste en limitar el número de comensales sentados a la mesa. Si tenemos una mesa
-para N filósofos, la solución consistiría en dejar que sólo haya N-1 filósofos como máximo sentados a la
-mesa en cada momento, de forma que cualquiera de ellos puede comer sin temor a bloqueos. Para ello,
-contamos con un portero que controla el acceso. Mientras un filósofo está pensando, este está fuera de
-la mesa (no está en la configuración que representa la mesa). El portero se encarga de controlar el
-número de filósofos a N-1, es decir, un filósofo sólo puede sentarse a la mesa si no se ha superado el
-límite de comensales en ella, y abandona la mesa cuando deja de comer. Para garantizar que ningún
-filósofo se queda sin sentarse en la mesa si lo desea, tenemos que garantizar que el portero deja entrar
-a los filósofos de forma justa. Podemos garantizarlo implementando una cola para los filósofos que
-desean pasar a la mesa, de forma que cuando un filósofo pasa a estar hambriento se pone en una cola,
-que eventualmente le dará acceso a la mesa.
+Otra solución consiste en limitar el número de comensales sentados a la mesa. Si tenemos una mesa para N filósofos, la solución consistiría en dejar que sólo haya N-1 filósofos como máximo sentados a la mesa en cada momento, de forma que cualquiera de ellos puede comer sin temor a bloqueos. Para ello, contamos con un portero que controla el acceso. Mientras un filósofo está pensando, este está fuera de la mesa (no está en la configuración que representa la mesa). El portero se encarga de controlar el número de filósofos a N-1, es decir, un filósofo sólo puede sentarse a la mesa si no se ha superado el límite de comensales en ella, y abandona la mesa cuando deja de comer. Para garantizar que ningún filósofo se queda sin sentarse en la mesa si lo desea, tenemos que garantizar que el portero deja entrar
+a los filósofos de forma justa. Podemos garantizarlo implementando una cola para los filósofos que desean pasar a la mesa, de forma que cuando un filósofo pasa a estar hambriento se pone en una cola, que eventualmente le dará acceso a la mesa.
 
 Para ello, se definirá un tipo **System** con constructor
-
+``` scala
 op [ _ ,_ ,_ ] : Configuration Queue Configuration -> System .
-
-que representa la mesa (primer argumento), la cola de filósofos hambrientos en espera de pasar a la
-mesa (segundo argumento) y el conjunto de filósofos fuera de la mesa. Inicialmente, los palillos estarán
-en la mesa (primer argumento), sólo filósofos en la mesa podrán acceder a ellos, y estos serán devueltos
-a la mesa cuando terminan de ser usados antes de abandonar la mesa. La cola la implementaremos
-como una lista de valores de tipo Nat/{P}, en la que los elementos se añaden por un extremo y se sacan
-por el otro. Los filósofos en espera se mantendrán en la configuración del tercer argumento mientras se
+```
+que representa la mesa (primer argumento), la cola de filósofos hambrientos en espera de pasar a la mesa (segundo argumento) y el conjunto de filósofos fuera de la mesa. Inicialmente, los palillos estarán en la mesa (primer argumento), sólo filósofos en la mesa podrán acceder a ellos, y estos serán devueltos a la mesa cuando terminan de ser usados antes de abandonar la mesa. La cola la implementaremos
+como una lista de valores de tipo Nat/{P}, en la que los elementos se añaden por un extremo y se sacan por el otro. Los filósofos en espera se mantendrán en la configuración del tercer argumento mientras se
 les da paso.
 
 Crea una copia del fichero del Ejercicio 1 en un fichero dining-philosophers-rooms.maude y modifícalo de forma que funcione según esta variación con las siguientes reglas:
