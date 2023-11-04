@@ -28,7 +28,7 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
 protecting NAT/{P} .
 protecting QUEUE/{P} .
 
-sorts Status Philosopher Chopstick Configuration Queue System .
+sorts Status Philosopher Chopstick Configuration System .
 subsort Philosopher Chopstick < Configuration .
 
 op none : -> Configuration [ctor] .
@@ -49,10 +49,10 @@ var chop : Chopstick .
 var Q : Queue .
 vars Conf1 Conf2 : Configuration .
 
-var P : philosopher .
+var P : Philosopher .
 op count : Configuration -> Nat .
 eq count(none) = 0 .
-eq count(P Conf2) = s count(Conf2) .
+eq count(P Conf2) = s (count(Conf2)) .
 
 var K : Nat .
 op initState : Nat -> Configuration .
@@ -62,16 +62,11 @@ eq initState (s K) = chopstick([K]) philosopher([K], thinking, 0)  (initState(K)
 
 rl [get-hungry] : [Conf1, Q, philosopher([P1], thinking, 0) Conf2] => [Conf1, Q, philosopher([P1], hungry, 0) Conf2] .
 rl [in-queue] : [Conf1, Q, philosopher([P1], hungry, 0) Conf2] => [Conf1, [P1] Q, Conf2] .
-crl [enter] : [Conf1, Q [P1] Conf2] => [Conf1 philosopher([P1], hungry, 0), Q, Conf2] if s count(Conf2) < k .
+crl [enter] : [Conf1, Q [P1], Conf2] => [Conf1 philosopher([P1], hungry, 0), Q, Conf2] if s count(Conf2) < k .
 crl [grab-stick] : [Conf1 philosopher([P1], hungry, N) chopstick([C]), Q, Conf2] =>  [Conf1 philosopher([P1], hungry, s N), Q, Conf2]
 if ([C] == [P1]) or ([C] == [s P1]) and (N < 2) .
 rl [eat] : [Conf1 philosopher([P1], hungry, 2), Q, Conf2] => [Conf1 philosopher([P1], eating, 2), Q, Conf2] .
-rl [think] : [Conf1 philosopher([P1], eating, 2), Q, Conf2] => [Conf1, Q, philosopher([P1], thinking, 0) Conf2]
-
-
-crl [grab-stick] : chopstick([C]) philosopher([P1], hungry, N) => philosopher([P1], hungry, s N) if ([C] == [P1]) or ([C] == [s P1]) .
-crl [eat] : philosopher([P1], hungry, N) => philosopher([P1], eating, N) if N == 2 .
-rl [think] : philosopher([P1], eating, N) => philosopher([P1], thinking, 0) .
+rl [think] : [Conf1 philosopher([P1], eating, 2), Q, Conf2] => [Conf1, Q, philosopher([P1], thinking, 0) Conf2] .
 
 endm
 
