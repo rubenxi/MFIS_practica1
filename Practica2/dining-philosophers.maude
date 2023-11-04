@@ -6,65 +6,67 @@ op k : -> NzNat .
 endfth
 
 fmod NAT/{k :: NAT*} is
-sort Nat/{k} .
-op [_] : Nat -> Nat/{k} .
-var N : Nat .
-ceq [N] = [sd(N, k)] if N >= k .
+    sort Nat/{k} .
+    op [_] : Nat -> Nat/{k} .
+    var N : Nat .
+    ceq [N] = [sd(N, k)] if N >= k .
 endfm
 
 mod DINING-PHILOSOPHERS{P :: NAT*} is
-protecting NAT/{P} .
+    protecting NAT/{P} .
 
-sorts Status Philosopher Chopstick Configuration .
-subsort Philosopher Chopstick < Configuration .
+    sorts Status Philosopher Chopstick Configuration .
+    subsort Philosopher Chopstick < Configuration .
 
-op none : -> Configuration [ctor] .
-op __ : Configuration Configuration -> Configuration [ctor assoc comm id: none] .
-op philosopher : Nat/{P} Status Nat -> Philosopher [ctor] .
-op chopstick : Nat/{P} -> Chopstick [ctor] .
-op thinking : -> Status .
-op eating : -> Status .
-op hungry : -> Status .
+    op none : -> Configuration [ctor] .
+    op __ : Configuration Configuration -> Configuration [ctor assoc comm id: none] .
+    op philosopher : Nat/{P} Status Nat -> Philosopher .
+    op chopstick : Nat/{P} -> Chopstick .
+    op thinking : -> Status .
+    op eating : -> Status .
+    op hungry : -> Status .
 
-var P1 : Nat .
-var N : Nat .
-var C : Nat .
-var phil : Philosopher .
-var chop : Chopstick .
-
-var K : Nat .
-op initState : Nat -> Configuration .
-eq initState(0) = none .
-eq initState (s K) = chopstick([K]) philosopher([K], thinking, 0)  (initState(K)) .
+    var N : Nat .
+    var M : Nat .
+    var C : Nat .
+   
+    var K : Nat .
+    op initState : Nat -> Configuration .
+    eq initState(0) = none .
+    eq initState (s K) = chopstick([K]) philosopher([K], thinking, 0)  (initState(K)) .
 
 
-rl [get-hungry] : philosopher([P1], thinking, N) => philosopher([P1], hungry, N) .
-crl [grab-stick] : chopstick([C]) philosopher([P1], hungry, N) => philosopher([P1], hungry, s N) if ([C] == [P1]) or ([C] == [s P1]) .
-crl [eat] : philosopher([P1], hungry, N) => philosopher([P1], eating, N) if N == 2 .
-rl [think] : philosopher([P1], eating, N) => philosopher([P1], thinking, 0) .
+    rl [get-hungry] : philosopher([N], thinking, C) => philosopher([N], hungry, C) .
+    crl [grab-stick] : philosopher([N], hungry, C) chopstick([M]) => philosopher([N], hungry, s C) 
+    if (([N] == [M]) or ([M] == [s N])) and (C < 2) .
+    rl [eat] : philosopher([N], hungry, 2) => philosopher([N], eating, 2) .
+    rl [think] : philosopher([N], eating, 2) => philosopher([N], thinking, 0) chopstick([N]) chopstick([s N]).
 
 endm
 
 view 5 from NAT* to INT is
-op k to term 5 .
+    op k to term 5 .
 endv
 
 mod DINING-PHILOSOPHERS-5 is
-pr DINING-PHILOSOPHERS{5} .
+    pr DINING-PHILOSOPHERS{5} .
 endm
 
 mod DINING-PHILOSOPHERS-PREDS{P :: NAT*} is
-pr DINING-PHILOSOPHERS{P} .
-inc SATISFACTION .
-subsort Configuration < State .
-op phil-status : Nat/{P} Status -> Prop .
-op phil-sticks : Nat/{P} Nat -> Prop .
-var N : Nat/{P} .
-var S : Status .
-var M : Nat .
-var C : Configuration .
-eq philosopher(N, S, M) C |= phil-status(N, S) = true .
-eq philosopher(N, S, M) C |= phil-sticks(N, M) = true .
+    pr DINING-PHILOSOPHERS{P} .
+    inc SATISFACTION .
+
+    subsort Configuration < State .
+
+    op phil-status : Nat/{P} Status -> Prop .
+    op phil-sticks : Nat/{P} Nat -> Prop .
+    
+    var N : Nat/{P} .
+    var S : Status .
+    var M : Nat .
+    var C : Configuration .
+    eq philosopher(N, S, M) C |= phil-status(N, S) = true .
+    eq philosopher(N, S, M) C |= phil-sticks(N, M) = true .
 endm
 
 mod DINING-PHILOSOPHERS-5-CHECK is
