@@ -60,3 +60,23 @@ endv
 mod DINING-PHILOSOPHERS-5 is
 pr DINING-PHILOSOPHERS{5} .
 endm
+
+mod DINING-PHILOSOPHERS-PREDS{P :: NAT*} is
+pr DINING-PHILOSOPHERS{P} .
+inc SATISFACTION .
+subsort Configuration < State .
+op phil-status : Nat/{P} Status -> Prop .
+op phil-sticks : Nat/{P} Nat -> Prop .
+var N : Nat/{P} .
+var S : Status .
+var M : Nat .
+var C : Configuration .
+eq philosopher(N, S, M) C |= phil-status(N, S) = true .
+eq philosopher(N, S, M) C |= phil-sticks(N, M) = true .
+endm
+
+mod DINING-PHILOSOPHERS-5-CHECK is
+pr DINING-PHILOSOPHERS-PREDS{5} .
+inc MODEL-CHECKER .
+inc LTL-SIMPLIFIER .
+endm
