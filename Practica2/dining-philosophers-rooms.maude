@@ -55,9 +55,17 @@ eq count(none) = 0 .
 eq count(P Conf2) = s (count(Conf2)) .
 
 var K : Nat .
-op initState : Nat -> Configuration .
-eq initState(0) = none .
-eq initState (s K) = chopstick([K]) philosopher([K], thinking, 0)  (initState(K)) .
+op initState : Nat -> System .
+eq initState(0) = [none, nilQueue, none] .
+eq initState (s K) = [chopstick([s K]) initChopstick(K), nilQueue, philosopher([s K], thinking, 0) initPhilosopher(K)] .
+
+op initPhilosopher : Nat -> Configuration .
+eq initPhilosopher(0) = none .
+eq initPhilosopher(s K) = philosopher([s K], thinking, 0) initPhilosopher(K) . 
+
+op initChopstick : Nat -> Configuration .
+eq initChopstick(0) = none .
+eq initChopstick(s K) = chopstick([s K]) initChopstick(K) . 
 
 
 rl [get-hungry] : [Conf1, Q, philosopher([P1], thinking, 0) Conf2] => [Conf1, Q, philosopher([P1], hungry, 0) Conf2] .
