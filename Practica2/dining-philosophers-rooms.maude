@@ -11,9 +11,7 @@ op [_] : Nat -> Nat/{k} .
 var N : Nat .
 ceq [N] = [sd(N, k)] if N >= k .
 
-var M : Nat .
-op _<_ : Nat/{k} Nat/{k} -> Bool .
-ceq [N] < [M] = true if sd(N, k) < sd(M, k) .
+
 endfm
 
 fmod QUEUE/{P :: NAT*} is
@@ -53,6 +51,7 @@ var P : Philosopher .
 op count : Configuration -> Nat .
 eq count(none) = 0 .
 eq count(P Conf2) = s (count(Conf2)) .
+eq count(chopstick([C]) Conf2) = count(Conf2) .
 
 var K : Nat .
 op initState : Nat -> System .
@@ -70,11 +69,11 @@ eq initChopstick(s K) = chopstick([s K]) initChopstick(K) .
 
 rl [get-hungry] : [Conf1, Q, philosopher([P1], thinking, 0) Conf2] => [Conf1, Q, philosopher([P1], hungry, 0) Conf2] .
 rl [in-queue] : [Conf1, Q, philosopher([P1], hungry, 0) Conf2] => [Conf1, [P1] Q, Conf2] .
-crl [enter] : [Conf1, Q [P1], Conf2] => [Conf1 philosopher([P1], hungry, 0), Q, Conf2] if s count(Conf2) < k .
-crl [grab-stick] : [Conf1 philosopher([P1], hungry, N) chopstick([C]), Q, Conf2] =>  [Conf1 philosopher([P1], hungry, s N), Q, Conf2]
-if ([C] == [P1]) or ([C] == [s P1]) and (N < 2) .
-rl [eat] : [Conf1 philosopher([P1], hungry, 2), Q, Conf2] => [Conf1 philosopher([P1], eating, 2), Q, Conf2] .
-rl [think] : [Conf1 philosopher([P1], eating, 2), Q, Conf2] => [Conf1, Q, philosopher([P1], thinking, 0) Conf2] .
+crl [enter] : [Conf1, Q [P1], Conf2] => [philosopher([P1], hungry, 0) Conf1, Q, Conf2] if s count(Conf1) < k .
+crl [grab-stick] : [philosopher([P1], hungry, N) chopstick([C]) Conf1, Q, Conf2] =>  [philosopher([P1], hungry, s N) Conf1, Q, Conf2]
+if (([P1] == [C]) or ([C] == [s P1])) and (N < 2) .
+rl [eat] : [philosopher([P1], hungry, 2) Conf1, Q, Conf2] => [philosopher([P1], eating, 2) Conf1, Q, Conf2] .
+rl [think] : [philosopher([P1], eating, 2) Conf1, Q, Conf2] => [chopstick([P1]) chopstick([s P1]) Conf1, Q, philosopher([P1], thinking, 0) Conf2] .
 
 endm
 
@@ -89,15 +88,19 @@ endm
 mod DINING-PHILOSOPHERS-PREDS{P :: NAT*} is
 pr DINING-PHILOSOPHERS{P} .
 inc SATISFACTION .
-subsort Configuration < State .
+subsort System < State .
 op phil-status : Nat/{P} Status -> Prop .
 op phil-sticks : Nat/{P} Nat -> Prop .
 var N : Nat/{P} .
 var S : Status .
 var M : Nat .
-var C : Configuration .
-eq philosopher(N, S, M) C |= phil-status(N, S) = true .
-eq philosopher(N, S, M) C |= phil-sticks(N, M) = true .
+vars Conf1, Conf2 : Configuration .
+var Q : Queue .
+
+eq [philosopher(N, S, M) Conf1, Q, Conf2] |= phil-status(N, S) = true .
+eq [Conf1, Q, philosopher(N, S, M) Conf2] |= phil-status(N, S) = true .
+eq [philosopher(N, S, M) Conf1, Q, Conf2] |= phil-sticks(N, M) = true .
+eq [Conf1, Q, philosopher(N, S, M) Conf2] |= phil-sticks(N, M) = true .
 endm
 
 mod DINING-PHILOSOPHERS-5-CHECK is
