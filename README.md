@@ -461,7 +461,7 @@ Se usará el comando modelCheck.
 Se comprobará si siempre que el filósofo esté en el estado hungry, acabará llegando al estado eating en algún momento.
 
 Se usará el comando:
-```
+```scala
 Maude> red modelCheck(initState(5), [] ( phil-status([0], hungry) -> <>(phil-status([0], eating))) ) .
 
 reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState(5), [](phil-status([0], hungry) -> <>
@@ -546,7 +546,7 @@ Se usará el comando modelCheck.
 Se comprobará que si un filósofo está en estado hungry infinitamente a menudo, entonces pasará al estado eating infinitamente a menudo.
 
 Se usará el comando:
-```
+```scala
 Maude> red modelCheck(initState(5), [] ( phil-status([0], hungry) -> <>(phil-status([0], eating))) ) .
   
 reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState(5), []<> phil-status([0], hungry) -> []<>
