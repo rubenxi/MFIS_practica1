@@ -632,16 +632,27 @@ Analiza el contraejemplo devuelto en cualquiera de las comprobaciones de **[ Q10
 
 
 Filósofo 0 tiene hambre  
+
 Filósofo 1 tiene hambre  
+
 Filósofo 2 tiene hambre  
+
 Filósofo 3 tiene hambre  
+
 Filósofo 4 tiene hambre  
+
 Filósofo 0 a la espera
+
 Filósofo 1 a la espera 
+
 Filósofo 2 a la espera 
+
 Filósofo 3 a la espera 
+
 Filósofo 4 a la espera 
+
 Filósofo 0 entra  
+
 
 
 ## Ejercicio 4: Un gestor de recursos
