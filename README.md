@@ -186,6 +186,25 @@ state 1699, Configuration: chopstick([4]) philosopher([0], hungry, 1) philosophe
 state 1987, Configuration: philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2],
     hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1)
 ```
+Por último con el comando:
+```scala
+Maude> show path labels 1987 .
+```
+Obtenemos:
+``` scala
+get-hungry
+grab-stick
+get-hungry
+grab-stick
+get-hungry
+grab-stick
+get-hungry
+grab-stick
+get-hungry
+grab-stick
+```
+
+
 
 ### [ Q3 ] 
 **Utiliza el comprobador de modelos de Maude para encontrar un camino hasta el estado de bloqueo. Como conocemos el estado de bloqueo (cada filósofo tiene un palillo), podemos encontrarlo verificando la propiedad temporal que niega la existencia de dicho estado: siempre es verdad que no tenemos un estado de bloqueo.**
