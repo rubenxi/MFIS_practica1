@@ -635,11 +635,11 @@ Filósofo 1 tiene hambre
 Filósofo 2 tiene hambre  
 Filósofo 3 tiene hambre  
 Filósofo 4 tiene hambre  
-Filósofo 0 entra en la cola
-Filósofo 1 entra en la cola
-Filósofo 2 entra en la cola
-Filósofo 3 entra en la cola 
-Filósofo 4 entra en la cola
+Filósofo 0 entra en la cola  
+Filósofo 1 entra en la cola  
+Filósofo 2 entra en la cola  
+Filósofo 3 entra en la cola   
+Filósofo 4 entra en la cola  
 Filósofo 0 se sienta en la mesa  
 
 ## Ejercicio 4: Un gestor de recursos
