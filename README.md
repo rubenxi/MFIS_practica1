@@ -123,15 +123,68 @@ result Configuration: chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]
 Se usa el siguiente comando:
 ``` scala
 Maude> search [1, 1000] in DINING-PHILOSOPHERS-5-CHECK : initState(5) =>! c:Configuration .
-
+``` 
 El estado de bloqueo encontrado es:
-
-Solution 1 (state 2708)
-states: 3267  rewrites: 174868 in 57ms cpu (56ms real) (3067859
-	rewrites/second)
-c:Configuration --> philosopher([0], hungry, 1) philosopher([1], hungry, 1)
-	philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4],
-	hungry, 1)
+``` scala
+Solution 1 (state 1987)
+states: 2120  rewrites: 162715 in 42ms cpu (43ms real) (3800953 rewrites/second)
+c:Configuration --> philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1)
+    philosopher([3], hungry, 1) philosopher([4], hungry, 1)
+```
+Y usando el comando:
+``` scala
+Maude> show path 1987 .
+```
+Se obtiene la secuencia de pasos:
+``` scala
+state 0, Configuration: chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4])
+    philosopher([0], thinking, 0) philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher(
+    [3], thinking, 0) philosopher([4], thinking, 0)
+===[ rl philosopher([N:Nat], thinking, C:Nat) => philosopher([N:Nat], hungry, C:Nat) [label get-hungry] .
+    ]===>
+state 1, Configuration: chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4])
+    philosopher([0], hungry, 0) philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([
+    3], thinking, 0) philosopher([4], thinking, 0)
+===[ crl chopstick([M:Nat]) philosopher([N:Nat], hungry, C:Nat) => philosopher([N:Nat], hungry, s C:Nat)
+    if ([N:Nat] == [M:Nat] or [M:Nat] == [s N:Nat]) and C:Nat < 2 = true [label grab-stick] . ]===>
+state 6, Configuration: chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0],
+    hungry, 1) philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0)
+    philosopher([4], thinking, 0)
+===[ rl philosopher([N:Nat], thinking, C:Nat) => philosopher([N:Nat], hungry, C:Nat) [label get-hungry] .
+    ]===>
+state 27, Configuration: chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0],
+    hungry, 1) philosopher([1], hungry, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0)
+    philosopher([4], thinking, 0)
+===[ crl chopstick([M:Nat]) philosopher([N:Nat], hungry, C:Nat) => philosopher([N:Nat], hungry, s C:Nat)
+    if ([N:Nat] == [M:Nat] or [M:Nat] == [s N:Nat]) and C:Nat < 2 = true [label grab-stick] . ]===>
+state 86, Configuration: chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 1)
+    philosopher([1], hungry, 1) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([
+    4], thinking, 0)
+===[ rl philosopher([N:Nat], thinking, C:Nat) => philosopher([N:Nat], hungry, C:Nat) [label get-hungry] .
+    ]===>
+state 223, Configuration: chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 1)
+    philosopher([1], hungry, 1) philosopher([2], hungry, 0) philosopher([3], thinking, 0) philosopher([4],
+    thinking, 0)
+===[ crl chopstick([M:Nat]) philosopher([N:Nat], hungry, C:Nat) => philosopher([N:Nat], hungry, s C:Nat)
+    if ([N:Nat] == [M:Nat] or [M:Nat] == [s N:Nat]) and C:Nat < 2 = true [label grab-stick] . ]===>
+state 472, Configuration: chopstick([3]) chopstick([4]) philosopher([0], hungry, 1) philosopher([1],
+    hungry, 1) philosopher([2], hungry, 1) philosopher([3], thinking, 0) philosopher([4], thinking, 0)
+===[ rl philosopher([N:Nat], thinking, C:Nat) => philosopher([N:Nat], hungry, C:Nat) [label get-hungry] .
+    ]===>
+state 844, Configuration: chopstick([3]) chopstick([4]) philosopher([0], hungry, 1) philosopher([1],
+    hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 0) philosopher([4], thinking, 0)
+===[ crl chopstick([M:Nat]) philosopher([N:Nat], hungry, C:Nat) => philosopher([N:Nat], hungry, s C:Nat)
+    if ([N:Nat] == [M:Nat] or [M:Nat] == [s N:Nat]) and C:Nat < 2 = true [label grab-stick] . ]===>
+state 1286, Configuration: chopstick([4]) philosopher([0], hungry, 1) philosopher([1], hungry, 1)
+    philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], thinking, 0)
+===[ rl philosopher([N:Nat], thinking, C:Nat) => philosopher([N:Nat], hungry, C:Nat) [label get-hungry] .
+    ]===>
+state 1699, Configuration: chopstick([4]) philosopher([0], hungry, 1) philosopher([1], hungry, 1)
+    philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 0)
+===[ crl chopstick([M:Nat]) philosopher([N:Nat], hungry, C:Nat) => philosopher([N:Nat], hungry, s C:Nat)
+    if ([N:Nat] == [M:Nat] or [M:Nat] == [s N:Nat]) and C:Nat < 2 = true [label grab-stick] . ]===>
+state 1987, Configuration: philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2],
+    hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1)
 ```
 
 ### [ Q3 ] 
