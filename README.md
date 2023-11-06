@@ -637,11 +637,12 @@ Filósofo 2 tiene hambre
 Filósofo 3 tiene hambre  
 Filósofo 4 tiene hambre  
 Filósofo 0 a la espera
-Filósofo 1 a la espera
-Filósofo 2 a la espera
-Filósofo 3 a la espera
-Filósofo 4 a la espera
-Filósofo 0 entra 
+Filósofo 1 a la espera 
+Filósofo 2 a la espera 
+Filósofo 3 a la espera 
+Filósofo 4 a la espera 
+Filósofo 0 entra  
+
 
 ## Ejercicio 4: Un gestor de recursos
 Alternativamente, además de filósofos y palillos, en esta solución añadimos un camarero al sistema.
