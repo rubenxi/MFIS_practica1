@@ -61,13 +61,13 @@ utilizamos la sintaxis op OP to term TERM ., para interpretar k como 5 como sigu
 
     ``` scala 
     view 5 from NAT* to INT is  
-    op k to term 5 .  
+        op k to term 5 .  
     endv
     ```
 - Con esto ya estamos listos para crear un módulo en el que analizar el problema.
     ``` scala
     mod DINING-PHILOSOPHERS-5 is  
-    pr DINING-PHILOSOPHERS{5} .  
+        pr DINING-PHILOSOPHERS{5} .  
     endm
     ```
 ### [ Q1 ] 
@@ -418,11 +418,38 @@ Demuestra, utilizando el comando search, que esta especificación no tiene bloqu
 Para poder utilizar el comprobador de modelos necesitamos adaptar las definiciones de las proposiciones
 atómicas en el módulo DINING-PHILOSOPHERS-PREDS al nuevo tipo de estado.
 
+Ejecutando el comando: 
+```scala
+Maude> search [1,1000] initState(5) =>! s:System .
+search [1, 1000] in DINING-PHILOSOPHERS-5-CHECK : initState(5) =>! s:System .
+No solution.
+states: 22137  rewrites: 1513234 in 551ms cpu (551ms real) (2746341
+	rewrites/second)
+
+```
+No encuentra estados de bloqueo
+
+
 ### [ Q9 ] 
 Demuestra, utilizando el comprobador de modelos, que esta especificación no tiene bloqueos.
 Esta solución, sin embargo, no es justa. Cualquiera de los filósofos puede quedarse sin comer aunque lo
 desee.
 
+Ejecutando el comando: 
+```scala 
+Maude> red modelCheck(initState(5), [] ~(phil-sticks([0],1) /\ phil-sticks([1],1) /\ phil-sticks([2],1) /\ phil-sticks([3],1) /\ phil-sticks([4],1) ) ) .
+reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState(5), []~ (
+	phil-sticks([4], 1) /\ (phil-sticks([3], 1) /\ (phil-sticks([2], 1) /\ (
+	phil-sticks([0], 1) /\ phil-sticks([1], 1)))))) .
+rewrites: 1518333 in 1207ms cpu (1209ms real) (1257939 rewrites/second)
+result Bool: true
+
+```
+
+Se evalúa el estado de bloqueo para comprobar si se cumple.
+Si se cumple usando [], se cumple siempre. Y si se cumple siempre, significa que no hay ningún estado en el que todos los filósofos tengan un palillo.
+
+Siendo el resultado True, no hay contraejemplos que lleguen a estado de bloqueo, así que no hay.
 ### [ Q10 ] 
 Comprueba, utilizando el comprobador de modelos, que esta especificación no satisface la
 propiedad de viveza débil ni la de viveza fuerte.

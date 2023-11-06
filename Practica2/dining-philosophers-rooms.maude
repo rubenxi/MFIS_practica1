@@ -1,86 +1,92 @@
 load model-checker.maude
-
+*** Teoría que se utiliza para definir el problema de los filósofos para
+*** Cualquier número k de filósofos.
 fth NAT* is
-protecting NAT .
-op k : -> NzNat .
+    protecting NAT .
+    op k : -> NzNat .
 endfth
-
+*** Módulo funcional que utiliza un tipo Nat/{k} de naturales mod. k
+*** Define la operación [_] que transforma cualquier número natural a su correspondiente
+*** número natural módulo k.
 fmod NAT/{k :: NAT*} is
-sort Nat/{k} .
-op [_] : Nat -> Nat/{k} .
-var N : Nat .
-ceq [N] = [sd(N, k)] if N >= k .
-
-
+    sort Nat/{k} .
+    op [_] : Nat -> Nat/{k} .
+    var N : Nat .
+    ceq [N] = [sd(N, k)] if N >= k .
 endfm
 
+*** Módulo funcional que define el tipo de colas de tamaño k.
 fmod QUEUE/{P :: NAT*} is
-pr NAT/{P} .
-sort Queue .
-subsort Nat/{P} < Queue .
-op nilQueue : -> Queue .
-op __ : Queue Queue -> Queue [ctor assoc id: nilQueue] .
+    pr NAT/{P} .
+    sort Queue .
+    subsort Nat/{P} < Queue .
+    op nilQueue : -> Queue .
+    op __ : Queue Queue -> Queue [ctor assoc id: nilQueue] .
 endfm
-
+*** Módulo de sistema que define las reglas y operaciones del problema de los filósofos
+*** para cualquier número k de filósofos.
 mod DINING-PHILOSOPHERS{P :: NAT*} is
-protecting NAT/{P} .
-protecting QUEUE/{P} .
-
-sorts Status Philosopher Chopstick Configuration System .
-subsort Philosopher Chopstick < Configuration .
-
-op none : -> Configuration [ctor] .
-op __ : Configuration Configuration -> Configuration [ctor assoc comm id: none] .
-op philosopher : Nat/{P} Status Nat -> Philosopher [ctor] .
-op chopstick : Nat/{P} -> Chopstick [ctor] .
-op [_,_,_] : Configuration Queue Configuration -> System [ctor] .
-op thinking : -> Status .
-op eating : -> Status .
-op hungry : -> Status .
-
-
-var P1 : Nat .
-var N : Nat .
-var C : Nat .
-var phil : Philosopher .
-var chop : Chopstick .
-var Q : Queue .
-vars Conf1 Conf2 : Configuration .
-
-var P : Philosopher .
-op count : Configuration -> Nat .
-eq count(none) = 0 .
-eq count(P Conf2) = s (count(Conf2)) .
-eq count(chopstick([C]) Conf2) = count(Conf2) .
-
-var K : Nat .
-op initState : Nat -> System .
-eq initState(0) = [none, nilQueue, none] .
-eq initState (s K) = [chopstick([s K]) initChopstick(K), nilQueue, philosopher([s K], thinking, 0) initPhilosopher(K)] .
-
-op initPhilosopher : Nat -> Configuration .
-eq initPhilosopher(0) = none .
-eq initPhilosopher(s K) = philosopher([s K], thinking, 0) initPhilosopher(K) . 
-
-op initChopstick : Nat -> Configuration .
-eq initChopstick(0) = none .
-eq initChopstick(s K) = chopstick([s K]) initChopstick(K) . 
+    protecting NAT/{P} .
+    protecting QUEUE/{P} .
+    *** Los tipos de datos que se utilizan en el problema son:
+    sorts Status Philosopher Chopstick Configuration System .
+    subsort Philosopher Chopstick < Configuration .
+    *** Las operaciones que se pueden realizar son:
+    op none : -> Configuration [ctor] .
+    op __ : Configuration Configuration -> Configuration [ctor assoc comm id: none] .
+    op philosopher : Nat/{P} Status Nat -> Philosopher [ctor] .
+    op chopstick : Nat/{P} -> Chopstick [ctor] .
+    op [_,_,_] : Configuration Queue Configuration -> System [ctor] .
+   
+   *** Los estados que puede tener un filósofo son:
+    op thinking : -> Status .
+    op eating : -> Status .
+    op hungry : -> Status .
 
 
-rl [get-hungry] : [Conf1, Q, philosopher([P1], thinking, 0) Conf2] => [Conf1, Q, philosopher([P1], hungry, 0) Conf2] .
-rl [in-queue] : [Conf1, Q, philosopher([P1], hungry, 0) Conf2] => [Conf1, [P1] Q, Conf2] .
-crl [enter] : [Conf1, Q [P1], Conf2] => [philosopher([P1], hungry, 0) Conf1, Q, Conf2] if s count(Conf1) < k .
-crl [grab-stick] : [philosopher([P1], hungry, N) chopstick([C]) Conf1, Q, Conf2] =>  [philosopher([P1], hungry, s N) Conf1, Q, Conf2]
-if (([P1] == [C]) or ([C] == [s P1])) and (N < 2) .
-rl [eat] : [philosopher([P1], hungry, 2) Conf1, Q, Conf2] => [philosopher([P1], eating, 2) Conf1, Q, Conf2] .
-rl [think] : [philosopher([P1], eating, 2) Conf1, Q, Conf2] => [chopstick([P1]) chopstick([s P1]) Conf1, Q, philosopher([P1], thinking, 0) Conf2] .
+    var P1 : Nat .
+    var N : Nat .
+    var C : Nat .
+    var phil : Philosopher .
+    var chop : Chopstick .
+    var Q : Queue .
+    vars Conf1 Conf2 : Configuration .
+    *** Operación count que cuenta el número de filósofos en la configuración.
+    var P : Philosopher .
+    op count : Configuration -> Nat .
+    eq count(none) = 0 .
+    eq count(P Conf2) = s (count(Conf2)) .
+    eq count(chopstick([C]) Conf2) = count(Conf2) .
+    *** La configuración inicial del problema es:
+    var K : Nat .
+    op initState : Nat -> System .
+    eq initState(0) = [none, nilQueue, none] .
+    eq initState (s K) = [chopstick([s K]) initChopstick(K), nilQueue, philosopher([s K], thinking, 0) initPhilosopher(K)] .
+
+    op initPhilosopher : Nat -> Configuration .
+    eq initPhilosopher(0) = none .
+    eq initPhilosopher(s K) = philosopher([s K], thinking, 0) initPhilosopher(K) . 
+
+    op initChopstick : Nat -> Configuration .
+    eq initChopstick(0) = none .
+    eq initChopstick(s K) = chopstick([s K]) initChopstick(K) . 
+
+    *** Las reglas que se utilizan para resolver el problema son:
+    rl [get-hungry] : [Conf1, Q, philosopher([P1], thinking, 0) Conf2] => [Conf1, Q, philosopher([P1], hungry, 0) Conf2] .
+    rl [in-queue] : [Conf1, Q, philosopher([P1], hungry, 0) Conf2] => [Conf1, [P1] Q, Conf2] .
+    crl [enter] : [Conf1, Q [P1], Conf2] => [philosopher([P1], hungry, 0) Conf1, Q, Conf2] if s count(Conf1) < k .
+    crl [grab-stick] : [philosopher([P1], hungry, N) chopstick([C]) Conf1, Q, Conf2] =>  [philosopher([P1], hungry, s N) Conf1, Q, Conf2]
+    if (([P1] == [C]) or ([C] == [s P1])) and (N < 2) .
+    rl [eat] : [philosopher([P1], hungry, 2) Conf1, Q, Conf2] => [philosopher([P1], eating, 2) Conf1, Q, Conf2] .
+    rl [think] : [philosopher([P1], eating, 2) Conf1, Q, Conf2] => [chopstick([P1]) chopstick([s P1]) Conf1, Q, philosopher([P1], thinking, 0) Conf2] .
 
 endm
-
+*** Definimos la vista para indicar como instanciamos la constante k
+*** De forma predefinida se instancia a 5, el número base de los filósofos
 view 5 from NAT* to INT is
 op k to term 5 .
 endv
-
+*** Este módulo define el problema de los filósofos para 5 filósofos
 mod DINING-PHILOSOPHERS-5 is
 pr DINING-PHILOSOPHERS{5} .
 endm

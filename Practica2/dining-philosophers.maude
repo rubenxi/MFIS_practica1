@@ -1,10 +1,15 @@
 load model-checker.maude
 
+*** Teoría que se utiliza para definir el problema de los filósofos para
+*** Cualquier número k de filósofos.
 fth NAT* is
 protecting NAT .
 op k : -> NzNat .
 endfth
 
+*** Módulo funcional que utiliza un tipo Nat/{k} de naturales mod. k
+*** Define la operación [_] que transforma cualquier número natural a su correspondiente
+*** número natural módulo k.
 fmod NAT/{k :: NAT*} is
     sort Nat/{k} .
     op [_] : Nat -> Nat/{k} .
@@ -12,16 +17,23 @@ fmod NAT/{k :: NAT*} is
     ceq [N] = [sd(N, k)] if N >= k .
 endfm
 
+*** Módulo de sistema que define las reglas y operaciones del problema de los filósofos
+*** para cualquier número k de filósofos.
 mod DINING-PHILOSOPHERS{P :: NAT*} is
     protecting NAT/{P} .
 
+    *** Los tipos de datos que se utilizan en el problema son:
     sorts Status Philosopher Chopstick Configuration .
     subsort Philosopher Chopstick < Configuration .
 
     op none : -> Configuration [ctor] .
     op __ : Configuration Configuration -> Configuration [ctor assoc comm id: none] .
+   
+   *** Las operaciones que se pueden realizar son:
     op philosopher : Nat/{P} Status Nat -> Philosopher .
     op chopstick : Nat/{P} -> Chopstick .
+    
+    *** Los estados que puede tener un filósofo son:
     op thinking : -> Status .
     op eating : -> Status .
     op hungry : -> Status .
@@ -30,12 +42,13 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     var M : Nat .
     var C : Nat .
    
+   *** La configuración inicial del problema es:
     var K : Nat .
     op initState : Nat -> Configuration .
     eq initState(0) = none .
     eq initState (s K) = chopstick([K]) philosopher([K], thinking, 0)  (initState(K)) .
 
-
+    *** Las reglas que se utilizan para resolver el problema son:
     rl [get-hungry] : philosopher([N], thinking, C) => philosopher([N], hungry, C) .
     crl [grab-stick] : philosopher([N], hungry, C) chopstick([M]) => philosopher([N], hungry, s C) 
     if (([N] == [M]) or ([M] == [s N])) and (C < 2) .
@@ -44,10 +57,13 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
 
 endm
 
+*** Definimos la vista para indicar como instanciamos la constante k
+*** De forma predefinida se instancia a 5, el número base de los filósofos
 view 5 from NAT* to INT is
     op k to term 5 .
 endv
 
+*** Este módulo define el problema de los filósofos para 5 filósofos
 mod DINING-PHILOSOPHERS-5 is
     pr DINING-PHILOSOPHERS{5} .
 endm
