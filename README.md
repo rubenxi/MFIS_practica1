@@ -453,6 +453,180 @@ Siendo el resultado True, no hay contraejemplos que lleguen a estado de bloqueo,
 ### [ Q10 ] 
 Comprueba, utilizando el comprobador de modelos, que esta especificación no satisface la
 propiedad de viveza débil ni la de viveza fuerte.
+
+
+Para comprobar viveza débil comprobaremos si un proceso que está a la espera de entrar en su sección crítica lo hará.
+
+Se usará el comando modelCheck.
+Se comprobará si siempre que el filósofo esté en el estado hungry, acabará llegando al estado eating en algún momento.
+
+Se usará el comando:
+```
+Maude> red modelCheck(initState(5), [] ( phil-status([0], hungry) -> <>(phil-status([0], eating))) ) .
+
+reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState(5), [](phil-status([0], hungry) -> <>
+   phil-status([0], eating))) .
+rewrites: 4019 in 0ms cpu (1ms real) (4031093 rewrites/second)
+result ModelCheckResult: counterexample({[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3])
+   chopstick([4]),nilQueue,philosopher([0], thinking, 0) philosopher([1], thinking, 0) philosopher([2],
+   thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0)],'get-hungry} {[chopstick([
+   0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),nilQueue,philosopher([0], hungry, 0)
+   philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher(
+   [4], thinking, 0)],'get-hungry} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3])
+   chopstick([4]),nilQueue,philosopher([0], hungry, 0) philosopher([1], hungry, 0) philosopher([2],
+   thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0)],'get-hungry} {[chopstick([
+   0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),nilQueue,philosopher([0], hungry, 0)
+   philosopher([1], hungry, 0) philosopher([2], hungry, 0) philosopher([3], thinking, 0) philosopher([4],
+   thinking, 0)],'get-hungry} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([
+   4]),nilQueue,philosopher([0], hungry, 0) philosopher([1], hungry, 0) philosopher([2], hungry, 0)
+   philosopher([3], hungry, 0) philosopher([4], thinking, 0)],'get-hungry} {[chopstick([0]) chopstick([
+   1]) chopstick([2]) chopstick([3]) chopstick([4]),nilQueue,philosopher([0], hungry, 0) philosopher([1],
+   hungry, 0) philosopher([2], hungry, 0) philosopher([3], hungry, 0) philosopher([4], hungry, 0)],
+   'in-queue} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),[0],
+   philosopher([1], hungry, 0) philosopher([2], hungry, 0) philosopher([3], hungry, 0) philosopher([4],
+   hungry, 0)],'in-queue} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),[
+   1] [0],philosopher([2], hungry, 0) philosopher([3], hungry, 0) philosopher([4], hungry, 0)],'in-queue}
+   {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),[2] [1] [0],philosopher([
+   3], hungry, 0) philosopher([4], hungry, 0)],'in-queue} {[chopstick([0]) chopstick([1]) chopstick([2])
+   chopstick([3]) chopstick([4]),[3] [2] [1] [0],philosopher([4], hungry, 0)],'in-queue} {[chopstick([0])
+   chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),[4] [3] [2] [1] [0],none],'enter} {[
+   chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry,
+   0),[4] [3] [2] [1],none],'enter} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3])
+   chopstick([4]) philosopher([0], hungry, 0) philosopher([1], hungry, 0),[4] [3] [2],none],'enter} {[
+   chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 0)
+   philosopher([1], hungry, 0) philosopher([2], hungry, 0),[4] [3],none],'enter} {[chopstick([0])
+   chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 0) philosopher([
+   1], hungry, 0) philosopher([2], hungry, 0) philosopher([3], hungry, 0),[4],none],'grab-stick} {[
+   chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 1) philosopher([
+   1], hungry, 0) philosopher([2], hungry, 0) philosopher([3], hungry, 0),[4],none],'grab-stick} {[
+   chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0)
+   philosopher([2], hungry, 0) philosopher([3], hungry, 0),[4],none],'grab-stick} {[chopstick([3])
+   chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([2], hungry, 1)
+   philosopher([3], hungry, 0),[4],none],'grab-stick} {[chopstick([4]) philosopher([0], hungry, 2)
+   philosopher([1], hungry, 0) philosopher([2], hungry, 2) philosopher([3], hungry, 0),[4],none],
+   'grab-stick} {[philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([2], hungry, 2)
+   philosopher([3], hungry, 1),[4],none],'eat} {[philosopher([0], hungry, 2) philosopher([1], hungry, 0)
+   philosopher([2], eating, 2) philosopher([3], hungry, 1),[4],none],'think} {[chopstick([2]) chopstick([
+   3]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([3], hungry, 1),[4],
+   philosopher([2], thinking, 0)],'get-hungry} {[chopstick([2]) chopstick([3]) philosopher([0], hungry,
+   2) philosopher([1], hungry, 0) philosopher([3], hungry, 1),[4],philosopher([2], hungry, 0)],'in-queue}
+   {[chopstick([2]) chopstick([3]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([
+   3], hungry, 1),[2] [4],none],'enter} {[chopstick([2]) chopstick([3]) philosopher([0], hungry, 2)
+   philosopher([1], hungry, 0) philosopher([3], hungry, 1) philosopher([4], hungry, 0),[2],none],
+   'grab-stick}, {[chopstick([2]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([
+   3], hungry, 2) philosopher([4], hungry, 0),[2],none],'eat} {[chopstick([2]) philosopher([0], hungry,
+   2) philosopher([1], hungry, 0) philosopher([3], eating, 2) philosopher([4], hungry, 0),[2],none],
+   'think} {[chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1],
+   hungry, 0) philosopher([4], hungry, 0),[2],philosopher([3], thinking, 0)],'get-hungry} {[chopstick([
+   2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher(
+   [4], hungry, 0),[2],philosopher([3], hungry, 0)],'in-queue} {[chopstick([2]) chopstick([3]) chopstick(
+   [4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([4], hungry, 0),[3] [2],
+   none],'enter} {[chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([
+   1], hungry, 0) philosopher([2], hungry, 0) philosopher([4], hungry, 0),[3],none],'grab-stick} {[
+   chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([2],
+   hungry, 1) philosopher([4], hungry, 0),[3],none],'grab-stick} {[chopstick([4]) philosopher([0],
+   hungry, 2) philosopher([1], hungry, 0) philosopher([2], hungry, 2) philosopher([4], hungry, 0),[3],
+   none],'eat} {[chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([2],
+   eating, 2) philosopher([4], hungry, 0),[3],none],'think} {[chopstick([2]) chopstick([3]) chopstick([
+   4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([4], hungry, 0),[3],
+   philosopher([2], thinking, 0)],'get-hungry} {[chopstick([2]) chopstick([3]) chopstick([4])
+   philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([4], hungry, 0),[3],philosopher([
+   2], hungry, 0)],'in-queue} {[chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2)
+   philosopher([1], hungry, 0) philosopher([4], hungry, 0),[2] [3],none],'enter} {[chopstick([2])
+   chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([3],
+   hungry, 0) philosopher([4], hungry, 0),[2],none],'grab-stick} {[chopstick([2]) chopstick([4])
+   philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([3], hungry, 1) philosopher([4],
+   hungry, 0),[2],none],'grab-stick})
+```
+Se encuentra un contraejemplo, así que la propiedad de viveza débil no se cumple.
+
+Para comprobar viveza fuerte comprobaremos si cuando un proceso espera infinitamente a menudo, entonces entra en su sección crítica infinitamente a menudo.
+
+Se usará el comando modelCheck.
+Se comprobará que si un filósofo está en estado hungry infinitamente a menudo, entonces pasará al estado eating infinitamente a menudo.
+
+Se usará el comando:
+```
+Maude> red modelCheck(initState(5), [] ( phil-status([0], hungry) -> <>(phil-status([0], eating))) ) .
+  
+reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState(5), []<> phil-status([0], hungry) -> []<>
+   phil-status([0], eating)) .
+rewrites: 4153 in 1ms cpu (1ms real) (2091137 rewrites/second)
+result ModelCheckResult: counterexample({[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3])
+   chopstick([4]),nilQueue,philosopher([0], thinking, 0) philosopher([1], thinking, 0) philosopher([2],
+   thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0)],'get-hungry} {[chopstick([
+   0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),nilQueue,philosopher([0], hungry, 0)
+   philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher(
+   [4], thinking, 0)],'get-hungry} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3])
+   chopstick([4]),nilQueue,philosopher([0], hungry, 0) philosopher([1], hungry, 0) philosopher([2],
+   thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0)],'get-hungry} {[chopstick([
+   0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),nilQueue,philosopher([0], hungry, 0)
+   philosopher([1], hungry, 0) philosopher([2], hungry, 0) philosopher([3], thinking, 0) philosopher([4],
+   thinking, 0)],'get-hungry} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([
+   4]),nilQueue,philosopher([0], hungry, 0) philosopher([1], hungry, 0) philosopher([2], hungry, 0)
+   philosopher([3], hungry, 0) philosopher([4], thinking, 0)],'get-hungry} {[chopstick([0]) chopstick([
+   1]) chopstick([2]) chopstick([3]) chopstick([4]),nilQueue,philosopher([0], hungry, 0) philosopher([1],
+   hungry, 0) philosopher([2], hungry, 0) philosopher([3], hungry, 0) philosopher([4], hungry, 0)],
+   'in-queue} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),[0],
+   philosopher([1], hungry, 0) philosopher([2], hungry, 0) philosopher([3], hungry, 0) philosopher([4],
+   hungry, 0)],'in-queue} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),[
+   1] [0],philosopher([2], hungry, 0) philosopher([3], hungry, 0) philosopher([4], hungry, 0)],'in-queue}
+   {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),[2] [1] [0],philosopher([
+   3], hungry, 0) philosopher([4], hungry, 0)],'in-queue} {[chopstick([0]) chopstick([1]) chopstick([2])
+   chopstick([3]) chopstick([4]),[3] [2] [1] [0],philosopher([4], hungry, 0)],'in-queue} {[chopstick([0])
+   chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]),[4] [3] [2] [1] [0],none],'enter} {[
+   chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry,
+   0),[4] [3] [2] [1],none],'enter} {[chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3])
+   chopstick([4]) philosopher([0], hungry, 0) philosopher([1], hungry, 0),[4] [3] [2],none],'enter} {[
+   chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 0)
+   philosopher([1], hungry, 0) philosopher([2], hungry, 0),[4] [3],none],'enter} {[chopstick([0])
+   chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 0) philosopher([
+   1], hungry, 0) philosopher([2], hungry, 0) philosopher([3], hungry, 0),[4],none],'grab-stick} {[
+   chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 1) philosopher([
+   1], hungry, 0) philosopher([2], hungry, 0) philosopher([3], hungry, 0),[4],none],'grab-stick} {[
+   chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0)
+   philosopher([2], hungry, 0) philosopher([3], hungry, 0),[4],none],'grab-stick} {[chopstick([3])
+   chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([2], hungry, 1)
+   philosopher([3], hungry, 0),[4],none],'grab-stick} {[chopstick([4]) philosopher([0], hungry, 2)
+   philosopher([1], hungry, 0) philosopher([2], hungry, 2) philosopher([3], hungry, 0),[4],none],
+   'grab-stick} {[philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([2], hungry, 2)
+   philosopher([3], hungry, 1),[4],none],'eat} {[philosopher([0], hungry, 2) philosopher([1], hungry, 0)
+   philosopher([2], eating, 2) philosopher([3], hungry, 1),[4],none],'think} {[chopstick([2]) chopstick([
+   3]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([3], hungry, 1),[4],
+   philosopher([2], thinking, 0)],'get-hungry} {[chopstick([2]) chopstick([3]) philosopher([0], hungry,
+   2) philosopher([1], hungry, 0) philosopher([3], hungry, 1),[4],philosopher([2], hungry, 0)],'in-queue}
+   {[chopstick([2]) chopstick([3]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([
+   3], hungry, 1),[2] [4],none],'enter} {[chopstick([2]) chopstick([3]) philosopher([0], hungry, 2)
+   philosopher([1], hungry, 0) philosopher([3], hungry, 1) philosopher([4], hungry, 0),[2],none],
+   'grab-stick}, {[chopstick([2]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([
+   3], hungry, 2) philosopher([4], hungry, 0),[2],none],'eat} {[chopstick([2]) philosopher([0], hungry,
+   2) philosopher([1], hungry, 0) philosopher([3], eating, 2) philosopher([4], hungry, 0),[2],none],
+   'think} {[chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1],
+   hungry, 0) philosopher([4], hungry, 0),[2],philosopher([3], thinking, 0)],'get-hungry} {[chopstick([
+   2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher(
+   [4], hungry, 0),[2],philosopher([3], hungry, 0)],'in-queue} {[chopstick([2]) chopstick([3]) chopstick(
+   [4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([4], hungry, 0),[3] [2],
+   none],'enter} {[chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([
+   1], hungry, 0) philosopher([2], hungry, 0) philosopher([4], hungry, 0),[3],none],'grab-stick} {[
+   chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([2],
+   hungry, 1) philosopher([4], hungry, 0),[3],none],'grab-stick} {[chopstick([4]) philosopher([0],
+   hungry, 2) philosopher([1], hungry, 0) philosopher([2], hungry, 2) philosopher([4], hungry, 0),[3],
+   none],'eat} {[chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([2],
+   eating, 2) philosopher([4], hungry, 0),[3],none],'think} {[chopstick([2]) chopstick([3]) chopstick([
+   4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([4], hungry, 0),[3],
+   philosopher([2], thinking, 0)],'get-hungry} {[chopstick([2]) chopstick([3]) chopstick([4])
+   philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([4], hungry, 0),[3],philosopher([
+   2], hungry, 0)],'in-queue} {[chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2)
+   philosopher([1], hungry, 0) philosopher([4], hungry, 0),[2] [3],none],'enter} {[chopstick([2])
+   chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([3],
+   hungry, 0) philosopher([4], hungry, 0),[2],none],'grab-stick} {[chopstick([2]) chopstick([4])
+   philosopher([0], hungry, 2) philosopher([1], hungry, 0) philosopher([3], hungry, 1) philosopher([4],
+   hungry, 0),[2],none],'grab-stick})
+```
+Se encuentra un contraejemplo, así que la propiedad de viveza fuerte no se cumple.
+
+Por tanto no satisface ninguna de las dos.
+
 ### [ Q11 ] 
 Analiza el contraejemplo devuelto en cualquiera de las comprobaciones de **[ Q10 ]** para proporcionar su secuencia de pasos como en **[ Q4 ]**.
 
