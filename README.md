@@ -738,16 +738,21 @@ empezar a comer.
 Asegúrate de modificar la definición del estado inicial (initState) adecuadamente.
 
 ### [ Q12 ] 
-**Demuestra, utilizando el comando search, si esta especificación tiene bloqueos o no.**
+**Demuestra, utilizando el comando search, si esta especificación tiene bloqueos o no.**  
+Utilizando este comando, comprobamos en los 1000 primeros niveles del espacio de búsqueda que no se da la situación de bloqueo utilizando el comando search.
+
 ```scala
 Maude> search[1, 1000] init(5) =>! c:Configuration .      
 search [1, 1000] in DINING-PHILOSOPHERS-5-CHECK : init(5) =>! c:Configuration .
 
 No solution.
 ```
+Al no haber encontrado una solución, se verifica que, para ese espacio de búsqueda no se encuentra una situación de bloqueo.
 ### [ Q13 ] 
-**Demuestra, utilizando el comprobador de modelos, si esta especificación tiene bloqueos o no.**
+**Demuestra, utilizando el comprobador de modelos, si esta especificación tiene bloqueos o no.**  
+Utilizando el comprobador de modelos a través del comando modelCheck y partiendo del estado inicial con 5 filósofos, comprobamos que no se da la situación de bloqueo en la que cada filósofo tiene un palillo en la mano.
 
+La propiedad que queremos que se satisfaga es que siempre se cumpla que no se de la situación en el que todos los filósofos tienen solamente un palillo.
 ```scala
 Maude> red modelCheck(init(5), [] ~(phil-sticks([0],1) /\
 phil-sticks([1],1) /\ phil-sticks([2],1) /\ phil-sticks([3],1)
@@ -756,7 +761,7 @@ reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(init(5), []~ (phil-sticks([4]
 rewrites: 53603 in 31ms cpu (46ms real) (1715296 rewrites/second)
 result Bool: true
 ```
-
+Al devolvernos true y no haberse generado ningún contraejemplo, significa que la propiedad se ha cumplido y por tanto no ha habido ninguna situación de bloqueo .
 ### [ Q14 ] 
 **Demuestra, utilizando el comprobador de modelos, si esta especificación satisface las propiedades de viveza débil y fuerte o no.**
 
@@ -791,7 +796,7 @@ rewrites: 34 in 0ms cpu (0ms real) (~ rewrites/second)
 result Bool: true
 
 ```
-Como se puede comprobar, la propiedad de viveza débil se cumple para los 5 filósofos.
+Al devolvernos true en los 5 casos, quiere decir que la propiedad de viveza débil se ha satisfacido para los 5 casos base (los 5 filósofos) y por lo tanto la especificación cumple la propiedad de viveza débil. 
 
 #### Viveza Fuerte
 
