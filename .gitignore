@@ -58,3 +58,9 @@ triangular-peg-solitaire.maude
 umaudemc
 unary-nat-c.maude
 unary-nat.maude
+demo-peano+lr-ac.maude
+nat-list+ac-r.maude
+NuITP_alpha23.maude
+peano+acxr.maude
+peano+lr.maude
+peano+rxr.maude
