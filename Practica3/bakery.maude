@@ -1,0 +1,50 @@
+load model-checker.maude .
+
+mod BPROCESS is
+    pr NAT .
+    including CONFIGURATION .
+    sort BProcess Mode .
+    subsort BProcess < Cid .
+    op BProcess : -> BProcess .
+    op mode: _ : Mode -> Attribute [gather (&)] .
+    op number: _ : Nat -> Attribute [gather (&)] .
+endm
+
+mod DISPENSER is
+    pr NAT .
+    including CONFIGURATION .
+    sort Dispenser .
+    subsort Dispenser < Cid .
+    op Dispenser : -> Dispenser .
+    ops next:_ last:_ : Nat -> Attribute [gather (&)] .
+endm
+
+mod BAKERY is
+    pr BPROCESS .
+    pr DISPENSER .
+    sort GBState .
+    subsort Configuration < GBState . 
+    subsort Nat < Oid .
+
+    op [[_]] : Configuration -> GBState .
+    ops sleep wait crit : -> Mode .
+
+    vars a b : Oid .
+    vars N L T : Nat .
+    var ATS : AttributeSet .
+
+    rl [sleep-wait] : < a : BProcess | mode: sleep, number: N > < b : Dispenser | next: T, last: L > =>
+                        < a : BProcess | mode: wait, number: L > < b : Dispenser | next: T, last: s L > .
+    rl [wait-crit] : < a : BProcess | mode: wait, number: N > < b : Dispenser | next: N, ATS > =>
+                        < a : BProcess | mode: crit, number: N > < b : Dispenser | next: N, ATS > .
+    rl [crit-sleep] : < a : BProcess | mode: crit, number: N > < b : Dispenser | next: N, ATS > =>
+                        < a : BProcess | mode: sleep, number: 0 > < b : Dispenser | next: s N, ATS > .
+
+    op initial : Nat -> GBState .
+    eq initial(N) = [[init(N)]] .
+
+    op init : Nat -> Configuration .
+    eq init(0) = < 0 : Dispenser | next: 1, last: 1 > .
+    eq init(s N) = < s N : BProcess | mode: sleep, number: 0 > init(N) .
+endm
+
