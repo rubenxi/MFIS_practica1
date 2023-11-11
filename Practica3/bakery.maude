@@ -35,8 +35,10 @@ mod BAKERY is
 
     rl [sleep-wait] : < a : BProcess | mode: sleep, number: N > < b : Dispenser | next: T, last: L > =>
                         < a : BProcess | mode: wait, number: L > < b : Dispenser | next: T, last: s L > .
+
     rl [wait-crit] : < a : BProcess | mode: wait, number: N > < b : Dispenser | next: N, ATS > =>
                         < a : BProcess | mode: crit, number: N > < b : Dispenser | next: N, ATS > .
+                        
     rl [crit-sleep] : < a : BProcess | mode: crit, number: N > < b : Dispenser | next: N, ATS > =>
                         < a : BProcess | mode: sleep, number: 0 > < b : Dispenser | next: s N, ATS > .
 
