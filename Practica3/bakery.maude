@@ -53,3 +53,47 @@ mod BAKERY is
     eq init(s N) = < s N : BProcess | mode: sleep, number: 0 > init(N) .
 endm
 
+mod ABSTRACT-BAKERY is
+    including BAKERY .
+    vars O O' : Oid .
+    vars N M T : Nat .
+    var ATTS : AttributeSet .
+    var C : Configuration .
+    var MODE : Mode .
+    var STATE : GBState .
+
+    op decOne : Configuration -> Configuration .
+    eq decOne( none ) = none .
+    eq decOne( < O : BProcess |  mode: sleep, number: N > C ) = < O : BProcess |  mode: sleep, number: N > decOne(C) .
+    eq decOne( < O : Dispenser | ATTS > C ) = < O : Dispenser | ATTS > decOne(C) .
+    ceq decOne( < O : BProcess |  mode: MODE,  number: 0 > C ) = < O : BProcess | mode: MODE, number: 0 > decOne(C) if MODE =/= sleep .
+    ceq decOne( < O : BProcess |  mode: MODE,  number: s N > C ) = < O : BProcess | mode: MODE, number: N > decOne(C) if MODE =/= sleep .
+
+    eq [[  C < O' : Dispenser | next: s s M, last: s T > ]]
+        = [[ decOne(C) < O' : Dispenser | next: s M, last: T > ]] .
+endm
+
+mod ABSTRACT-BAKERY-PREDS is
+    protecting ABSTRACT-BAKERY .
+    including SATISFACTION .
+    subsort GBState < State .
+
+    var MODE : Mode .
+    var G : GBState .
+    vars N M : Nat .
+    vars O O' : Oid .
+    var C : Configuration .
+
+    op mode : Nat Mode -> Prop .
+    eq [[ < O : BProcess | mode: MODE, number: N > C ]] |= mode(N, MODE) = true .
+    
+    op 2-crit : -> Prop .
+    eq [[ < O : BProcess |  mode: crit,  number: N > < O' : BProcess |  mode: crit,  number: M > C ]] 
+    |= 2-crit = true .
+endm
+
+mod ABSTRACT-BAKERY-CHECK is
+    protecting ABSTRACT-BAKERY-PREDS . 
+    including MODEL-CHECKER . 
+    including LTL-SIMPLIFIER .
+endm
