@@ -1,23 +1,26 @@
 load model-checker.maude .
 
-mod BPROCESS is
+omod BPROCESS is
     pr NAT .
     including CONFIGURATION .
-    sort BProcess Mode .
-    subsort BProcess < Cid .
-    op BProcess : -> BProcess .
+
+    sort Mode .
+    
+    class BProcess | mode : Mode, number : Nat .
+    
     op mode: _ : Mode -> Attribute [gather (&)] .
     op number: _ : Nat -> Attribute [gather (&)] .
-endm
+endom
 
-mod DISPENSER is
+
+omod DISPENSER is
     pr NAT .
     including CONFIGURATION .
-    sort Dispenser .
-    subsort Dispenser < Cid .
-    op Dispenser : -> Dispenser .
+
+    class Dispenser | next : Nat, last : Nat .
+
     ops next:_ last:_ : Nat -> Attribute [gather (&)] .
-endm
+endom
 
 mod BAKERY is
     pr BPROCESS .
