@@ -1,0 +1,40 @@
+load bakery.maude
+load model-checker.maude
+
+
+mod BAKERY+ is 
+    extending BAKERY .
+
+    var O : Oid .
+    vars N M : Nat .
+    vars ATTS ATTS' : AttributeSet .
+    var C : Configuration .
+    var MODE : Mode .
+
+    op processWithNumber : Configuration Nat -> Bool .
+    eq processWithNumber(none, N) = false .
+    eq processWithNumber(< O : BProcess |  mode: MODE, number: N > C, N) = true or processWithNumber(C, N) .
+    eq processWithNumber(< O : Dispenser | ATTS > C, N) = processWithNumber(C, N) .
+    ceq processWithNumber(< O : BProcess |  mode: MODE, number: M > C, N) = processWithNumber(C, N) if M =/= N .
+
+    rl [wait-sleep] : < O : BProcess |  mode: wait, number: N >  =>
+                    < O : BProcess |  mode: sleep, number: 0 > .
+
+    crl [skip-round] : [[ < O : Dispenser | next: N, ATTS > < O : BProcess | mode: wait, ATTS' > C ]]  =>
+                    [[ < O : Dispenser | next: s N, ATTS > < O : BProcess | mode: wait, ATTS' > C ]]
+                    if not(processWithNumber(< O : BProcess | mode: wait, ATTS' > C, N)) .
+endm
+
+mod ABSTRACT-BAKERY+ is
+    including BAKERY+ .
+    including ABSTRACT-BAKERY .
+
+    vars O O' : Oid .
+    vars N M : Nat .
+    var C : Configuration .
+    var MODE : Mode .
+
+    ceq [[ < O : Dispenser | next: s 0, last: s M > < O' : BProcess | mode: MODE, number: s N > C  ]] =
+        [[ < O : Dispenser | next: s 0, last: M > < O' : BProcess | mode: MODE, number: N > C ]] 
+        if not(processWithNumber(C, N)) .
+endm    
