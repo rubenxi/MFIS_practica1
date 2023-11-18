@@ -1,95 +1,61 @@
-load model-checker.maude .
+load model-checker.maude
 
-omod BPROCESS is
+omod BAKERY is
     pr NAT .
-    including CONFIGURATION .
-
-    sort Mode .
+   
+    class Dispenser | next : Nat, last : Nat .
+    sorts Mode GBState .
     
     class BProcess | mode : Mode, number : Nat .
-    
-    op mode: _ : Mode -> Attribute [gather (&)] .
-    op number: _ : Nat -> Attribute [gather (&)] .
-endom
-
-
-omod DISPENSER is
-    pr NAT .
-    including CONFIGURATION .
-
-    class Dispenser | next : Nat, last : Nat .
-
-    ops next:_ last:_ : Nat -> Attribute [gather (&)] .
-endom
-
-mod BAKERY is
-    pr BPROCESS .
-    pr DISPENSER .
-    sort GBState .
-    subsort Configuration < GBState . 
-    subsort Nat < Oid .
+    ops sleep wait crit : -> Mode [ctor] .
+    op id : Nat -> Oid .
 
     op [[_]] : Configuration -> GBState .
-    ops sleep wait crit : -> Mode .
 
-    vars a b : Oid .
-    vars N L T : Nat .
-    var ATS : AttributeSet .
+    vars O Z : Oid .
+    vars N M T : Nat .
+    vars ATTS ATTS' : AttributeSet .
+   
+    rl [waitToCrit] : < O : BProcess |  mode : wait, number : N > < Z : Dispenser | next : N, ATTS >  =>
+                    < O : BProcess |  mode : crit, number : N > < Z : Dispenser | next : N, ATTS > .
 
-    rl [sleep-wait] : < a : BProcess | mode: sleep, number: N > < b : Dispenser | next: T, last: L > =>
-                        < a : BProcess | mode: wait, number: L > < b : Dispenser | next: T, last: s L > .
+    rl [critToSleep] :  < O : BProcess |  mode : crit, number : N >  < Z : Dispenser | next : N, ATTS > =>
+                    < O : BProcess |  mode : sleep, number : 0 >  < Z : Dispenser | next : s(N), ATTS >  .
 
-    rl [wait-crit] : < a : BProcess | mode: wait, number: N > < b : Dispenser | next: N, ATS > =>
-                        < a : BProcess | mode: crit, number: N > < b : Dispenser | next: N, ATS > .
-                        
-    rl [crit-sleep] : < a : BProcess | mode: crit, number: N > < b : Dispenser | next: N, ATS > =>
-                        < a : BProcess | mode: sleep, number: 0 > < b : Dispenser | next: s N, ATS > .
+    rl [sleepToWait] : < O : BProcess |  mode : sleep, number : N >  < Z : Dispenser | next : T, last : M > =>
+                    < O : BProcess |  mode : wait, number : M >  < Z : Dispenser | next : T, last : s(M) >  .
 
     op initial : Nat -> GBState .
-    eq initial(N) = [[init(N)]] .
+    eq initial(N) = [[$initial(N)]] .
 
-    op init : Nat -> Configuration .
-    eq init(0) = < 0 : Dispenser | next: 1, last: 1 > .
-    eq init(s N) = < s N : BProcess | mode: sleep, number: 0 > init(N) .
-endm
+    op $initial : Nat -> Configuration .
+    eq $initial(0) =  < id(0) : Dispenser | next : s 0, last : s 0 > .
+    eq $initial(s N) = < id(s N) : BProcess |  mode : sleep, number : 0 > $initial(N) .
+    
+endom
 
 mod ABSTRACT-BAKERY is
-    including BAKERY .
-    vars O O' : Oid .
-    vars N M T : Nat .
-    var ATTS : AttributeSet .
-    var C : Configuration .
-    var MODE : Mode .
-    var STATE : GBState .
-
-    op decOne : Configuration -> Configuration .
-    eq decOne( none ) = none .
-    eq decOne( < O : BProcess |  mode: sleep, number: N > C ) = < O : BProcess |  mode: sleep, number: N > decOne(C) .
-    eq decOne( < O : Dispenser | ATTS > C ) = < O : Dispenser | ATTS > decOne(C) .
-    ceq decOne( < O : BProcess |  mode: MODE,  number: 0 > C ) = < O : BProcess | mode: MODE, number: 0 > decOne(C) if MODE =/= sleep .
-    ceq decOne( < O : BProcess |  mode: MODE,  number: s N > C ) = < O : BProcess | mode: MODE, number: N > decOne(C) if MODE =/= sleep .
-
-    eq [[  C < O' : Dispenser | next: s s M, last: s T > ]]
-        = [[ decOne(C) < O' : Dispenser | next: s M, last: T > ]] .
+    extending BAKERY .
+    var O : Oid .
+    var N : Nat .
+    var M : Mode .
+    ceq < O : BProcess | mode : M, number : s(N) > = < O : BProcess | mode : M, number : N > if M == sleep = false .
 endm
 
 mod ABSTRACT-BAKERY-PREDS is
     protecting ABSTRACT-BAKERY .
     including SATISFACTION .
     subsort GBState < State .
-
+    
     var MODE : Mode .
     var G : GBState .
     vars N M : Nat .
     vars O O' : Oid .
     var C : Configuration .
-
-    op mode : Nat Mode -> Prop .
-    eq [[ < O : BProcess | mode: MODE, number: N > C ]] |= mode(N, MODE) = true .
-    
-    op 2-crit : -> Prop .
-    eq [[ < O : BProcess |  mode: crit,  number: N > < O' : BProcess |  mode: crit,  number: M > C ]] 
-    |= 2-crit = true .
+    op mode : Nat Mode -> Prop . 
+    eq [[ < O : BProcess | mode : MODE, number : N > C ]] |= mode(N, MODE) = true .
+    op 2-crit : -> Prop . 
+    eq [[ < O : BProcess |  mode : crit,  number : N > < O' : BProcess |  mode : crit,  number : M > C ]] |= 2-crit = true .
 endm
 
 mod ABSTRACT-BAKERY-CHECK is
