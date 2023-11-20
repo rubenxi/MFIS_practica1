@@ -12,34 +12,34 @@ omod BAKERY is
 
     op [[_]] : Configuration -> GBState .
 
-    vars O Z : Oid .
+    vars BPid Did : Oid .
     vars N M T : Nat .
-    vars ATTS ATTS' : AttributeSet .
+    vars ATTS : AttributeSet .
    
-    rl [waitToCrit] : < O : BProcess |  mode : wait, number : N > < Z : Dispenser | next : N, ATTS >  =>
-                    < O : BProcess |  mode : crit, number : N > < Z : Dispenser | next : N, ATTS > .
+    rl [wait-crit] : < BPid : BProcess |  mode : wait, number : N > < Did : Dispenser | next : N, ATTS >  =>
+                    < BPid : BProcess |  mode : crit, number : N > < Did : Dispenser | next : N, ATTS > .
 
-    rl [critToSleep] :  < O : BProcess |  mode : crit, number : N >  < Z : Dispenser | next : N, ATTS > =>
-                    < O : BProcess |  mode : sleep, number : 0 >  < Z : Dispenser | next : s(N), ATTS >  .
+    rl [crit-sleep] :  < BPid : BProcess |  mode : crit, number : N >  < Did : Dispenser | next : N, ATTS > =>
+                    < BPid : BProcess |  mode : sleep, number : 0 >  < Did : Dispenser | next : s(N), ATTS >  .
 
-    rl [sleepToWait] : < O : BProcess |  mode : sleep, number : N >  < Z : Dispenser | next : T, last : M > =>
-                    < O : BProcess |  mode : wait, number : M >  < Z : Dispenser | next : T, last : s(M) >  .
+    rl [sleep-wait] : < BPid : BProcess |  mode : sleep, number : N >  < Did : Dispenser | next : T, last : M > =>
+                    < BPid : BProcess |  mode : wait, number : M >  < Did : Dispenser | next : T, last : s(M) >  .
 
     op initial : Nat -> GBState .
-    eq initial(N) = [[$initial(N)]] .
+    eq initial(N) = [[init(N)]] .
 
-    op $initial : Nat -> Configuration .
-    eq $initial(0) =  < id(0) : Dispenser | next : s 0, last : s 0 > .
-    eq $initial(s N) = < id(s N) : BProcess |  mode : sleep, number : 0 > $initial(N) .
+    op init : Nat -> Configuration .
+    eq init(0) =  < id(0) : Dispenser | next : s 0, last : s 0 > .
+    eq init(s N) = < id(s N) : BProcess |  mode : sleep, number : 0 > init(N) .
     
 endom
 
 mod ABSTRACT-BAKERY is
     extending BAKERY .
-    var O : Oid .
+    var BPid : Oid .
     var N : Nat .
     var M : Mode .
-    ceq < O : BProcess | mode : M, number : s(N) > = < O : BProcess | mode : M, number : N > if M == sleep = false .
+    ceq < BPid : BProcess | mode : M, number : s(N) > = < BPid : BProcess | mode : M, number : N > if M =/= sleep .
 endm
 
 mod ABSTRACT-BAKERY-PREDS is
@@ -50,12 +50,12 @@ mod ABSTRACT-BAKERY-PREDS is
     var MODE : Mode .
     var G : GBState .
     vars N M : Nat .
-    vars O O' : Oid .
+    vars BPid BPid' : Oid .
     var C : Configuration .
     op mode : Nat Mode -> Prop . 
-    eq [[ < O : BProcess | mode : MODE, number : N > C ]] |= mode(N, MODE) = true .
+    eq [[ < BPid : BProcess | mode : MODE, number : N > C ]] |= mode(N, MODE) = true .
     op 2-crit : -> Prop . 
-    eq [[ < O : BProcess |  mode : crit,  number : N > < O' : BProcess |  mode : crit,  number : M > C ]] |= 2-crit = true .
+    eq [[ < BPid : BProcess |  mode : crit,  number : N > < BPid' : BProcess |  mode : crit,  number : M > C ]] |= 2-crit = true .
 endm
 
 mod ABSTRACT-BAKERY-CHECK is
