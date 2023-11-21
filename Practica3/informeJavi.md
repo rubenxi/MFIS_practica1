@@ -42,6 +42,7 @@ El espacio no es finito ya que siempre se van incrementando los tickets de cada 
 El comando search no termina nunca, ya que el espacio de estados es infinito, pero podemos observar también que no va devolviendo ninguna solución porque se va cumpliendo la exclusión mutua, aunque sin la abstracción no podríamos estar seguros aún de que siempre se vaya a cumplir la propiedad. 
 
 **[Q3] Utiliza el comando search para comprobar si hay estados de bloqueo.**
+Al ejecutar este comando y no encontrar solución, se verifica que no encuentra estados de bloqueo.
 
 En el mismo fichero **bakery.maude**, crea un módulo **ABSTRACT-BAKERY** en el que se defina una abstracción de la teoría de reescritura definida en el módulo **BAKERY** utilizando la siguiente idea. Conforme el sistema avanza, los números de los procesos en espera están en el rango definido por los valores **next** y **last - 1** del dispensador. En realidad, nos da igual que los valores estén en el rango [next,last) o en [next-1,last-1) siempre que no se cambie el orden entre los procesos. Podemos por tando abstraer el
 sistema simplemente decrementando en uno los números de orden de todos los procesos (los que no estén en modo sleep, que tendrán número de orden 0), siempre que el valor de next sea mayor que 1.
@@ -49,9 +50,22 @@ sistema simplemente decrementando en uno los números de orden de todos los proc
 Observa que de esta forma identificamos todos aquellos estados que tienen sus procesos en los mismos modos y con el mismo orden entre ellos.
 
 **[Q4] Justifica la validez de la abstracción (protección de los booleanos, confluencia y terminación de la parte ecuacional, coherencia de ecuaciones y reglas).**
+Al incluir el módulo NAT, estamos incluyendo también el módulo BOOL. 			
+Al igual que antes, existe confluencia, pues se pueden aplicar a términos distintos
+
+
+Protección de los booleanos
+ En todos los módulos se usan los booleanos de forma protegida (protecting), ya que tenemos acceso al módulo BOOL porque protegemos el módulo NAT, que a su vez protege el módulo BOOL .					
+Confluencia y terminación de la parte ecuacional
+ Las ecuaciones son confluentes porque las nuevas (la de abstracción y las de decremento) solo se pueden aplicar a términos o subtérminos distintos.
+						
+Las ecuaciones son terminantes, las de decremento siempre llegan a la ecuación del caso base porque se va aplicando de forma recursiva sobre la configuración inicial entera y cada vez sobre una configuración con un elemento menos hasta llegar a none, donde se aplicaría la ecuación para el caso base. La ecuación de la abstracción, al utilizar decremento, que ya sabemos que es terminante, y al ir decrementando de 1 en 1, siempre acaba llegando a un término que no cumple la condición para que no pueda aplicarse más.
+						
+Coherencia
+ Las ecuaciones son coherentes con las reglas. Las partes izquierdas de las reglas están en forma normal y, tal y como están planteadas las reescrituras, es equivalente aplicar las reglas (ya sean wait, enter o exit) y después aplicar la ecuación de la abstracción para disminuir los valores de los números del dispensador y de los procesos que no están en sleep que disminuir primero los valores y luego aplicar cualquiera de las reglas. 
 
 **[Q5] En el módulo ABSTRACT-BAKERY, ¿es finito el espacio de búsqueda alcanzable a partir de estados definidos con el operador initial?**
-
+Con la abstracción se puede reducir el espacio de estados infinito a un espacio finito al reducir los estados infinitos del módulo BAKERY a un conjunto finito con la nueva ecuación. 
 **[Q6] Define, en un módulo ABSTRACT-BAKERY-PREDS proposiciones atómicas**
 ```scala
 op mode : Nat Mode -> Prop .
@@ -59,10 +73,42 @@ op 2-crit : -> Prop .
 ```
 **de forma que mode(N, M) se satisfaga si el proceso N está en modo M y 2-crit si hay dos procesos cualesquiera en la sección crítica.**
 
+```scala
+mod ABSTRACT-BAKERY-PREDS is
+    protecting ABSTRACT-BAKERY .
+    including SATISFACTION .
+    subsort GBState < State .
+    
+    var MODE : Mode .
+    var G : GBState .
+    vars N M : Nat .
+    vars BPid BPid' : Oid .
+    var C : Configuration .
+    op mode : Nat Mode -> Prop . 
+    eq [[ < BPid : BProcess | mode : MODE, number : N > C ]] |= mode(N, MODE) = true .
+    op 2-crit : -> Prop . 
+    eq [[ < BPid : BProcess |  mode : crit,  number : N > < BPid' : BProcess |  mode : crit,  number : M > C ]] |= 2-crit = true .
+endm
+```
 **[Q7] Comprueba que la abstracción es consistente con las proposiciones atómicas.**
 
-**[Q8] Utiliza el comprobador de modelos de Maude para comprobar la exclusión mutua del sistema con 5 procesos.**
+La abstracción extiende el módulo Bakery, cuyos términos son de la clase BProcess y Dispenser. La ecuación de la abstracción coge como parámetro un objeto de la clase BProcess y devuelve también un objeto de la misma clase decrementando en uno el número. Esto no provoca ni junk ni confusion, ya que no se están agregando nuevos elementos ni se están identificando elementos previamente distintos.
 
+**[Q8] Utiliza el comprobador de modelos de Maude para comprobar la exclusión mutua del sistema con 5 procesos.**
+```scala
+
+red modelCheck(initial(5),
+      ( ([] ~(mode(1, crit) /\ mode(2, crit)))  /\
+      ([] ~(mode(1, crit) /\ mode(3, crit)))  /\
+      ([] ~(mode(1, crit) /\ mode(4, crit)))  /\
+      ([] ~(mode(1, crit) /\ mode(5, crit)))  /\
+      ([] ~(mode(2, crit) /\ mode(3, crit)))  /\
+      ([] ~(mode(2, crit) /\ mode(4, crit)))  /\
+      ([] ~(mode(2, crit) /\ mode(5, crit)))  /\
+      ([] ~(mode(3, crit) /\ mode(4, crit)))  /\
+      ([] ~(mode(3, crit) /\ mode(5, crit)))  /\
+      ([] ~(mode(4, crit) /\ mode(5, crit))) )) .
+```
 **[Q9] Utiliza el comprobador de modelos de Maude para comprobar la propiedad de viveza débil y fuerte.**
 
 ## Ejercicio 2: La panadería modificada
