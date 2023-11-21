@@ -1,0 +1,82 @@
+load parallel++.maude
+
+mod DEKKER++ is
+    inc PARALLEL++ .
+    ops crit0 crit1 : -> UserStatement .
+    ops rem0 rem1 : -> LoopingUserStatement .
+    ops p0 p1 : -> Program .
+    op initial : -> MachineState .
+    op wants-to-enter : -> BoolVar .
+    op turn : -> IntVar .
+    var  M : Memory .
+    vars P R : Program .
+    var  S : Soup . 
+    var  I : Pid .
+
+    eq p0 
+      = repeat {
+          wants-to-enter[0] := true ;
+          while wants-to-enter[1] = true {
+              if turn != 0 {
+                wants-to-enter[0] := false ;
+                while turn != 0 {
+                    skip 
+                  } ;
+                wants-to-enter[0] := true 
+              } else {
+                skip 
+              }
+          } ;
+          crit0 ;
+          turn := 1 ;
+          wants-to-enter[0] := false ;
+          rem0 
+        } until true != true .
+
+    eq p1 
+      = repeat {
+          wants-to-enter[1] := true ;
+          while wants-to-enter[0] = true {
+              if turn != 1 {
+                  wants-to-enter[1] := false ;
+                  while turn != 1 {
+                      skip 
+                  } ;
+                  wants-to-enter[1] := true 
+              } else {
+                  skip 
+              } 
+          } ;
+          crit1 ;
+          turn := 0 ;
+          wants-to-enter[1] := false ;
+          rem1
+        } until true != true .
+
+    eq initial = { [1, p0] | [2, p1], [wants-to-enter, false false ] [turn, 1] } .
+endm
+
+rew [100] initial .
+---(
+rewrite [100] in DEKKER++ : initial .
+rewrites: 422 in 0ms cpu (0ms real) (1430508 rewrites/second)
+result MachineState: {[1, rem0 ; repeat{wants-to-enter[0] := true ; while wants-to-enter[1] = true{if turn != 0{wants-to-enter[0] := false ; while turn != 0{skip} ; wants-to-enter[0] := true}else{skip}} ; crit0 ; turn := 1 ; wants-to-enter[0] := false ; rem0}until (true != true)] | [2, wants-to-enter[1] := true ; while
+    wants-to-enter[0] = true{if turn != 1{wants-to-enter[1] := false ; while turn != 1{skip} ; wants-to-enter[1] := true}else{skip}} ; crit1 ; turn := 0 ; wants-to-enter[1] := false ; rem1 ; repeat{wants-to-enter[1] := true ; while wants-to-enter[0] = true{if turn != 1{wants-to-enter[1] := false ; while turn != 1{skip}
+    ; wants-to-enter[1] := true}else{skip}} ; crit1 ; turn := 0 ; wants-to-enter[1] := false ; rem1}until (true != true)], [turn, 1] [wants-to-enter, false false]}
+)
+
+search initial =>* {S | [0, crit0 ; R] | [1, crit1 ; P], M} .
+---(
+search in DEKKER++ : initial =>* {S | [1, crit0 ; R] | [2, crit1 ; P], M} .
+
+No solution.
+states: 152  rewrites: 1679 in 2ms cpu (2ms real) (708737 rewrites/second)
+)
+
+search initial =>! MS:MachineState .
+---(
+search in DEKKER++ : initial =>! MS:MachineState .
+
+No solution.
+states: 152  rewrites: 1679 in 1ms cpu (1ms real) (900751 rewrites/second)
+)
