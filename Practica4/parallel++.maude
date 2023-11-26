@@ -8,6 +8,7 @@ endfm
 
 fmod BOOLVAR is
     sort BoolVar .
+    op wte0 : -> BoolVar .
     op wants-to-enter : -> BoolVar . 
 endfm
 
