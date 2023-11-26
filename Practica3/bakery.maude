@@ -13,7 +13,7 @@ omod BAKERY is
     op [[_]] : Configuration -> GBState .
 
     vars BPid Did : Oid .
-    vars N M T : Nat .
+    vars N M T : Nat .      
     vars ATTS : AttributeSet .
    
     rl [wait-crit] : < BPid : BProcess |  mode : wait, number : N > < Did : Dispenser | next : N, ATTS >  =>
@@ -39,7 +39,7 @@ mod ABSTRACT-BAKERY is
     var BPid : Oid .
     var N : Nat .
     var M : Mode .
-    ceq < BPid : BProcess | mode : M, number : s(N) > = < BPid : BProcess | mode : M, number : N > if M =/= sleep .
+    ceq < BPid : BProcess | mode : M, number : s(N) > = < BPid : BProcess | mode : M, number : N > if M =/= sleep .         
 endm
 
 mod ABSTRACT-BAKERY-PREDS is

@@ -64,3 +64,5 @@ NuITP_alpha23.maude
 peano+acxr.maude
 peano+lr.maude
 peano+rxr.maude
+K-Framework/prueba.k
+.gitignore
