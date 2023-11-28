@@ -1,0 +1,156 @@
+load parallel++.maude
+
+fth NAT* is 
+  pr NAT * (op _>_ to _>'_, op _+_ to _+'_, 
+                    op _*_ to _*'_, op _-_ to _-'_) .
+  op k : -> NzNat .
+endfth
+
+mod BAKERY++{P :: NAT*} is
+    inc PARALLEL++ .
+    op crit : -> UserStatement .
+    op rem : -> LoopingUserStatement .
+    op p : Nat -> Program .
+    ops last number j : -> IntVar .
+    ops entering bigger : -> BoolVar .
+
+    var  M : Memory .
+    vars P1 P2 : Program .
+    var  S : Soup . 
+    var  I : Pid .
+    var  N N1 N2 : Nat .
+
+    eq p(N) 
+      = repeat {
+            ---- get a number
+            entering[N] := true ;
+            last := last + 1 ;
+            number[N] := last ;
+            entering[N] := false ;
+            
+            ---- compare your number with the number of the others
+            j[N] := 0 ;
+            while k > (j[N]) {
+                if j[N] != N { 
+                    ---- wait until process N takes its number
+                    while entering[j[N]] = true { 
+                        skip
+                    } ;
+                    ---- wait until j[N] is 0, has a greater number, or the same if j[N] is equal to N
+                    bigger[N] := true ;
+                    while bigger[N] = true {
+                        if number[j[N]] = 0 {
+                            bigger[N] := false 
+                        } else {
+                            if (number[j[N]]) > (number[N]) {
+                                bigger[N] := false 
+                            } else {
+                                if ((number[j[N]]) = (number[N])) & ((j[N]) > N) {
+                                    bigger[N] := false 
+                                }
+                            }
+                        }
+                    }
+                } ;
+                j[N] := (j[N]) + 1  
+            } ;
+            crit ;
+            number[N] := 0 ;
+            rem 
+        } 
+        .
+
+    op initial : -> MachineState .
+    op processes : Nat -> Soup .
+    op ints : Nat -> List{Int} .
+    op bools : Nat -> List{Bool} .
+    eq initial = { processes(k), 
+                   [last, 1] [number, ints(k)] [j, ints(k)] [entering, bools(k)] [bigger, bools(k)] } .
+    eq processes(0) = empty .
+    eq processes(s N) = [N, p(N)] | processes(N) .
+    eq ints(0) = nil .
+    eq ints(s N) = 0 ints(N) .
+    eq bools(0) = nil .
+    eq bools(s N) = false bools(N) .
+endm
+
+view 3 from NAT* to NAT * (op _>_ to _>'_, op _+_ to _+'_, 
+                           op _*_ to _*'_, op _-_ to _-'_) is 
+  op k to term 3 .
+endv
+
+mod BAKERY++3 is 
+  inc BAKERY++{3} .
+endm
+
+rew [100] initial .
+---(
+rewrites: 870 in 0ms cpu (0ms real) (1663479 rewrites/second)
+result MachineState: {[0, while bigger[0] = true{if number[j[0]] = 0{bigger[0] := false}else{if (number[j[0]]) > (number[0]){
+    bigger[0] := false}else{if number[j[0]] = (number[0]) & (j[0]) > 0{bigger[0] := false}}}} ; j[0] := (j[0]) + 1 ; while 3 >
+    (j[0]){if j[0] != 0{while entering[j[0]] = true{skip} ; bigger[0] := true ; while bigger[0] = true{if number[j[0]] = 0{
+    bigger[0] := false}else{if (number[j[0]]) > (number[0]){bigger[0] := false}else{if number[j[0]] = (number[0]) & (j[0]) > 0{
+    bigger[0] := false}}}}} ; j[0] := (j[0]) + 1} ; crit ; number[0] := 0 ; rem ; repeat{entering[0] := true ; last := last + 1
+    ; number[0] := last ; entering[0] := false ; j[0] := 0 ; while 3 > (j[0]){if j[0] != 0{while entering[j[0]] = true{skip} ;
+    bigger[0] := true ; while bigger[0] = true{if number[j[0]] = 0{bigger[0] := false}else{if (number[j[0]]) > (number[0]){
+    bigger[0] := false}else{if number[j[0]] = (number[0]) & (j[0]) > 0{bigger[0] := false}}}}} ; j[0] := (j[0]) + 1} ; crit ;
+    number[0] := 0 ; rem}] | [1, while bigger[1] = true{if number[j[1]] = 0{bigger[1] := false}else{if (number[j[1]]) > (
+    number[1]){bigger[1] := false}else{if number[j[1]] = (number[1]) & (j[1]) > 1{bigger[1] := false}}}} ; j[1] := (j[1]) + 1 ;
+    while 3 > (j[1]){if j[1] != 1{while entering[j[1]] = true{skip} ; bigger[1] := true ; while bigger[1] = true{if number[j[
+    1]] = 0{bigger[1] := false}else{if (number[j[1]]) > (number[1]){bigger[1] := false}else{if number[j[1]] = (number[1]) & (j[
+    1]) > 1{bigger[1] := false}}}}} ; j[1] := (j[1]) + 1} ; crit ; number[1] := 0 ; rem ; repeat{entering[1] := true ; last :=
+    last + 1 ; number[1] := last ; entering[1] := false ; j[1] := 0 ; while 3 > (j[1]){if j[1] != 1{while entering[j[1]] =
+    true{skip} ; bigger[1] := true ; while bigger[1] = true{if number[j[1]] = 0{bigger[1] := false}else{if (number[j[1]]) > (
+    number[1]){bigger[1] := false}else{if number[j[1]] = (number[1]) & (j[1]) > 1{bigger[1] := false}}}}} ; j[1] := (j[1]) + 1}
+    ; crit ; number[1] := 0 ; rem}] | [2, if number[j[2]] = 0{bigger[2] := false}else{if (number[j[2]]) > (number[2]){bigger[2]
+    := false}else{if number[j[2]] = (number[2]) & (j[2]) > 2{bigger[2] := false}}} ; while bigger[2] = true{if number[j[2]] =
+    0{bigger[2] := false}else{if (number[j[2]]) > (number[2]){bigger[2] := false}else{if number[j[2]] = (number[2]) & (j[2]) >
+    2{bigger[2] := false}}}} ; j[2] := (j[2]) + 1 ; while 3 > (j[2]){if j[2] != 2{while entering[j[2]] = true{skip} ; bigger[2]
+    := true ; while bigger[2] = true{if number[j[2]] = 0{bigger[2] := false}else{if (number[j[2]]) > (number[2]){bigger[2] :=
+    false}else{if number[j[2]] = (number[2]) & (j[2]) > 2{bigger[2] := false}}}}} ; j[2] := (j[2]) + 1} ; crit ; number[2] := 0
+    ; rem ; repeat{entering[2] := true ; last := last + 1 ; number[2] := last ; entering[2] := false ; j[2] := 0 ; while 3 > (
+    j[2]){if j[2] != 2{while entering[j[2]] = true{skip} ; bigger[2] := true ; while bigger[2] = true{if number[j[2]] = 0{
+    bigger[2] := false}else{if (number[j[2]]) > (number[2]){bigger[2] := false}else{if number[j[2]] = (number[2]) & (j[2]) > 2{
+    bigger[2] := false}}}}} ; j[2] := (j[2]) + 1} ; crit ; number[2] := 0 ; rem}], [last, 5] [number, 5 3 4] [j, 1 2 0] [
+    entering, false false false] [bigger, true true true]}
+)
+
+search [1,10] initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+search [1,15] initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+search [1,20] initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+search [1,25] initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+search [1,30] initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+search [1,35] initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+---(
+==========================================
+search [1, 10] in BAKERY++3 : initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+
+No solution.
+states: 406  rewrites: 4953 in 6ms cpu (6ms real) (779754 rewrites/second)
+==========================================
+search [1, 15] in BAKERY++3 : initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+
+No solution.
+states: 2076  rewrites: 32317 in 32ms cpu (33ms real) (990529 rewrites/second)
+==========================================
+search [1, 20] in BAKERY++3 : initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+
+No solution.
+states: 6591  rewrites: 124210 in 89ms cpu (92ms real) (1381246 rewrites/second)
+==========================================
+search [1, 25] in BAKERY++3 : initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+
+No solution.
+states: 15251  rewrites: 328309 in 209ms cpu (214ms real) (1566838 rewrites/second)
+==========================================
+search [1, 30] in BAKERY++3 : initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+
+No solution.
+states: 27728  rewrites: 661709 in 396ms cpu (404ms real) (1667042 rewrites/second)
+==========================================
+search [1, 35] in BAKERY++3 : initial =>* {S:Soup | [N1:Nat, crit ; P1:Program] | [N2:Nat, crit ; P2:Program], M:Memory} .
+
+No solution.
+states: 42557  rewrites: 1090966 in 624ms cpu (637ms real) (1747900 rewrites/second)
+Maude> 
+)

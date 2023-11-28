@@ -1,0 +1,34 @@
+/* Variables globales */
+  Número: vector [1..N] de enteros  = {todos a 0};
+  Eligiendo: vector [1..N] de booleanos = {todos a falso};
+    
+  /* Código del hilo i */
+  Hilo(i) {
+      loop {
+
+          /* Calcula el número de turno */
+          Eligiendo[i] = cierto;
+          Número[i] = 1 + max(Número[1],..., Número[N]);
+          Eligiendo[i] = falso;
+          
+          /* Compara con todos los hilos */
+          for j in 1..N {                     
+
+               /* Si el hilo j está calculando su número, espera a que termine */
+               while ( Eligiendo[j] ) { /* nada */ }       
+
+               /* Si el hilo j tiene más prioridad, espera a que ponga su número a cero */
+               /* j tiene más prioridad si su número de turno es más bajo que el de i,  */
+               /*  o bien si es el mismo número y además j es menor que i               */
+               while ( (Número[j] != 0) && ((Número[j], j) < (Número[i], i)) ) { /* nada */ }  
+          }
+
+          /* Sección crítica */
+         ...
+          /* Fin de sección crítica */
+
+          Número[i] = 0;
+
+          /* Código restante */
+      }
+  }
