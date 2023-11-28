@@ -8,6 +8,7 @@ endfm
 
 fmod BOOLVAR is
     sort BoolVar .
+    op wte0 : -> BoolVar .
     op wants-to-enter : -> BoolVar . 
 endfm
 
@@ -76,6 +77,9 @@ fmod EXPRESSION++ is
 
     op _[_] : IntExpression IntExpression -> IntExpression [ctor] .
     eq eval(IVar[E], [IVar, LI] M) = eval($getInt(eval(E, [IVar, LI] M), LI) , [IVar, LI] M) .
+
+    op _%_ : IntExpression IntExpression -> IntExpression [ctor] .
+    eq eval(E % E', M) = eval(E, M) rem eval(E', M) .
 
     op $getInt : Int List{Int} -> IntExpression .
     eq $getInt(0, N LI) = N .
