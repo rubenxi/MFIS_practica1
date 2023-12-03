@@ -37,6 +37,7 @@ fmod BOOL-EXPR is
   eq eval(Q > N, [Q, K] M) = K >' N .
   eq eval(Q > N, M) = 0 >' N [owise] .
   eq eval(B & B', M) = eval(B, M) and eval(B', M) .
+  
 endfm
 
 ---- Syntax for arithmetic expressions, and their evaluation semantics.
@@ -60,6 +61,7 @@ fmod INT-EXPR is
   eq eval(E + E', M) = eval(E, M) +' eval(E', M) .
   eq eval(E * E', M) = eval(E, M) *' eval(E', M) .
   eq eval(E - E', M) = eval(E, M) -' eval(E', M) .
+
 endfm
 
 ---- Syntax for a trivial sequential programming language. 
