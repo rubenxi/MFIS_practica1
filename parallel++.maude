@@ -159,16 +159,26 @@ fmod SEQUENTIAL++ is
     protecting TESTS++ .
     sorts UserStatement LoopingUserStatement Program .
     subsort LoopingUserStatement < UserStatement < Program .
+    var T : Test .
+    vars P1 P2 : Program .
+
     op skip : -> Program [ctor] .
     op _;_ : Program Program -> Program [ctor prec 61 assoc id: skip] .
     op _:=_ : IntExpression IntExpression -> Program [ctor] .
     op _:=_ : BoolExpression BoolExpression -> Program [ctor] .
-    op if_then_fi : Test Program -> Program [ctor] .
+    ---op if_then_fi : Test Program -> Program [ctor] .
 
-    op if_then_else_fi : Test Program Program -> Program [ctor] .
-    op while_do_od : Test Program -> Program [ctor] .
-    op repeat_until_li : Program Test -> Program [ctor] .
-    op repeat_forever : Program -> Program [ctor] .
+    op if_{_} : Test Program -> Program [ctor] .
+    op if_{_}else{_} : Test Program Program -> Program [ctor] .
+    op if_then_else_ : Test Program Program -> Program [ctor] .
+    op while_{_} : Test Program -> Program [ctor] .
+    op repeat{_} : Program -> Program [ctor] .
+    op repeat{_}until_ : Program Test -> Program [ctor] .
+
+    ---op if_then_else_fi : Test Program Program -> Program [ctor] .
+    ---op while_do_od : Test Program -> Program [ctor] .
+    ---op repeat_until_li : Program Test -> Program [ctor] .
+    ---op repeat_forever : Program -> Program [ctor] .
 endfm
 
 mod PARALLEL++ is
@@ -185,7 +195,7 @@ mod PARALLEL++ is
     op {_,_} : Soup Memory -> MachineState .
 
     ***new ( , ) define una nueva hebra
-    op new(_,_) : Pid Program -> Process [ctor] .
+    op new(_,_) : Pid Program -> Program [ctor] .
     eq new(P, PR) = [P , PR] .
 
 
@@ -237,20 +247,20 @@ mod PARALLEL++ is
         => {[Pid1, Program1] | Soup, [BoolVar, eval(BoolExpress,Mem)] Mem} 
         if BoolVar in Mem =/= true .
 
-    rl [if-then-fi] :{[Pid1, if Test then Program1 fi ; Program2] | Soup, Mem}
-        => {[Pid1, if eval(Test, Mem) then Program1 else skip fi ; Program2] | Soup, Mem} .
+    rl [if] :{[Pid1, if Test { Program1 } ; Program2] | Soup, Mem}
+        => {[Pid1, if eval(Test, Mem) = true { Program1 } else { skip }  ; Program2] | Soup, Mem} .
 
-    rl [if-then-else-fi] :{[Pid1, if Test then Program1 else Program2 fi ; Program3] | Soup, Mem}
-        => {[Pid1, if eval(Test, Mem) then Program1 else Program2 fi ; Program3] | Soup, Mem} .
+    rl [if-else] :{[Pid1, if Test {Program1} else {Program2} ; Program3] | Soup, Mem}
+        => {[Pid1, if eval(Test, Mem) = true {Program1} else {Program2} ; Program3] | Soup, Mem} .
 
-    rl [while-do-od] :{[Pid1, while Test do Program1 od ; Program2] | Soup, Mem}
-        => {[Pid1, if eval(Test, Mem) then (Program1 ; while Test do Program1 od) else skip fi ; Program2] | Soup, Mem} .
+    rl [while] :{[Pid1, while Test {Program1} ; Program2] | Soup, Mem}
+        => {[Pid1, if eval(Test, Mem) = true {(Program1 ; while Test {Program1})} else {skip} ; Program2] | Soup, Mem} .
 
-    rl [repeat-forever] :{[Pid1, repeat Program1 forever ; Program2] | Soup, Mem}
-        => {[Pid1, Program1 ; repeat Program1 forever ; Program2] | Soup, Mem} .
+    rl [repeat-forever] :{[Pid1, repeat {Program1} ; Program2] | Soup, Mem}
+        => {[Pid1, Program1 ; repeat {Program1} ; Program2] | Soup, Mem} .
 
-    rl [repeat_until_li] :{[Pid1, repeat Program1 until Test li ; Program2] | Soup, Mem}
-        => {[Pid1, Program1 ; if not eval(Test,Mem) then repeat Program1 until Test li else skip fi ; Program2] | Soup, Mem} .
+    rl [repeat_until_li] :{[Pid1, repeat {Program1} until Test ; Program2] | Soup, Mem}
+        => {[Pid1, Program1 ; if eval(Test,Mem) = false {repeat {Program1} until Test} else {skip} ; Program2] | Soup, Mem} .
     
     op $insert : Int Int List{Int} ->  List{Int} .
     eq $insert(0, I1, nil) = I1 .
