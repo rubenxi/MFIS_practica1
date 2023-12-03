@@ -195,7 +195,7 @@ mod PARALLEL++ is
     op {_,_} : Soup Memory -> MachineState .
 
     ***new ( , ) define una nueva hebra
-    op new(_,_) : Pid Program -> Process [ctor] .
+    op new(_,_) : Pid Program -> Program [ctor] .
     eq new(P, PR) = [P , PR] .
 
 
