@@ -1,0 +1,93 @@
+
+load parallel.maude
+load model-checker.maude
+
+mod DEKKER is
+  inc PARALLEL .
+
+  subsort Int < Pid .
+  ops crit0 crit1 : -> UserStatement .
+  ops rem0 rem1 : -> LoopingUserStatement .
+  ops p0 p1 : -> Program .
+  op initialMem : -> Memory .
+  op initial : -> MachineState .
+  ops wte0 wte1 : -> IntVar . ---- used as boolean variables: 0 is false, 1 is true
+  ops turn : -> IntVar .      ---- indicates whose turn it is
+  var  M : Memory .
+  vars P R : Program .
+  var  S : Soup . 
+  var  I : Pid .
+
+  eq p0 
+    = repeat {
+        wte0 := 1 ;
+        while wte1 = 1 {
+          if turn = 1 {
+            wte0 := 0 ;
+            while turn = 1 { 
+              skip 
+            } ;
+            wte0 := 1
+          }
+        } ;
+        crit0 ;
+        turn := 1 ;
+        wte0 := 0 ;
+        rem0
+      } .
+
+  eq p1 
+    = repeat {
+        wte1 := 1 ;
+        while wte0 = 1 {
+          if turn = 0 {
+            wte1 := 0 ;
+            while turn = 0 { 
+              skip 
+            } ;
+            wte1 := 1
+          }
+        } ;
+        crit1 ;
+        turn := 0 ;
+        wte1 := 0 ;
+        rem1
+      } .
+  
+  eq initialMem = [wte0, 0] [wte1, 0] [turn, 0] .
+  eq initial = { [0, p0] | [1, p1], initialMem} .
+
+endm
+
+mod DEKKER-PREDS is
+  pr DEKKER .
+  including SATISFACTION .
+
+   subsort MachineState < State .
+
+    op crit : UserStatement -> Prop .
+
+    var N : Nat .
+
+    var I : UserStatement .
+    var P : Program .
+    var S : Soup .
+    var M : Memory .
+
+    eq {S | [N, I ; P], M} |= crit(I) = true .
+endm
+
+mod DEKKER-CHECK is
+  including MODEL-CHECKER * (op _>_ to _>'_, op _+_ to _+'_, op _*_ to _*'_, op _-_ to _-'_) .
+  including DEKKER-PREDS .
+
+  op 2Crit : -> Formula .
+  eq 2Crit = ([] (~ crit(crit0)) \/ (~ crit(crit1))) .
+
+endm
+
+--- red modelCheck(initial, 2Crit) .
+
+--- search initial =>* {S | [0, crit0 ; R] | [1, crit1 ; P], M} .
+
+--- search initial =>! MS:MachineState .
