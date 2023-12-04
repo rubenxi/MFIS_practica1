@@ -20,7 +20,7 @@ mod BAKERY++{P :: NAT*} is
     var  N N1 N2 : Nat .
 
     
-    eq p(N) = repeat{ ---- get a number
+    
     eq p(N) = repeat{ ---- get a number
             entering[N] := true ;
             last := last + 1 ;
