@@ -1,0 +1,28 @@
+load parallel.maude
+fmod INTVAR is
+    sort IntVar .
+    op turn : -> IntVar . 
+    op 'c1 : -> IntVar .
+    op 'c2 : -> IntVar .
+    op turn : -> IntVar . 
+endfm
+
+fmod BOOLVAR is
+    sort BoolVar .
+    op wte0 : -> BoolVar .
+    op wants-to-enter : -> BoolVar . 
+endfm
+
+mod BOOLEXPR+++ is
+
+endm
+
+mod MEMORY+++ is
+
+endm
+
+mod PARALLEL+++ is 
+
+
+
+endm

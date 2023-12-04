@@ -14,7 +14,6 @@ fmod BOOLVAR is
 endfm
 
 fmod MEMORY++ is
-    protecting INT .
     pr BOOLVAR .
     pr INTVAR .
     sorts Memory Bool? .
@@ -67,14 +66,14 @@ fmod EXPRESSION++ is
     eq eval(IVar, [IVar, LI] M) = LI .
     eq eval(IVar, M) = 0 [owise] .
 
-    op _+'_ : IntExpression IntExpression -> IntExpression [ctor] .
-    eq eval(E +' E', M) = eval(E, M) + eval(E', M) .
+    op _+_ : IntExpression IntExpression -> IntExpression [ctor] .
+    eq eval(E +' E', M) = eval(E, M) +' eval(E', M) .
 
-    op _*'_ : IntExpression IntExpression -> IntExpression [ctor] .
-    eq eval(E *' E', M) = eval(E, M) * eval(E', M) .
+    op _*_ : IntExpression IntExpression -> IntExpression [ctor] .
+    eq eval(E *' E', M) = eval(E, M) *' eval(E', M) .
     
-    op _-'_ : IntExpression IntExpression -> IntExpression [ctor] .
-    eq eval(E -' E', M) = eval(E, M) + (- eval(E', M)) .
+    op _-_ : IntExpression IntExpression -> IntExpression [ctor] .
+    eq eval(E -' E', M) = eval(E, M) + (-' eval(E', M)) .
 
     op _[_] : IntExpression IntExpression -> IntExpression [ctor] .
     eq eval(IVar[E], [IVar, LI] M) = eval($getInt(eval(E, [IVar, LI] M), LI) , [IVar, LI] M) .
@@ -121,7 +120,7 @@ fmod TESTS++ is
     op _=_ : IntExpression IntExpression -> Test .
     op _=_ : BoolExpression BoolExpression -> Test .
 
-    op _>'_ : IntExpression IntExpression -> Test .
+    op _>_ : IntExpression IntExpression -> Test .
 
     op _!=_ : IntExpression IntExpression -> Test .
     op _!=_ : BoolExpression BoolExpression -> Test .
@@ -184,7 +183,7 @@ endfm
 mod PARALLEL++ is
     protecting SEQUENTIAL++ .
     sorts Pid Process Soup MachineState .
-    subsort Process < Soup .
+    subsort Program < Process < Soup .
     subsort Int < Pid .
     var P : Pid .
     var PR : Program .
@@ -195,8 +194,7 @@ mod PARALLEL++ is
     op {_,_} : Soup Memory -> MachineState .
 
     op new(_,_) : Pid Program -> Program [ctor] .
-    eq new(P, PR) = [P , PR] .
-
+    eq new(P, PR) = [P, PR] .
 
     vars Program1 Program2 Program3 : Program .
     var Soup : Soup .
