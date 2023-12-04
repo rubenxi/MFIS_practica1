@@ -194,7 +194,6 @@ mod PARALLEL++ is
     op _|_ : Soup Soup -> Soup [prec 61 assoc comm id: empty] .
     op {_,_} : Soup Memory -> MachineState .
 
-    ***new ( , ) define una nueva hebra
     op new(_,_) : Pid Program -> Program [ctor] .
     eq new(P, PR) = [P , PR] .
 
@@ -273,6 +272,4 @@ mod PARALLEL++ is
     eq $insertBool(s I1,B1,nil) = false $insertBool(I1,B1,nil) .
     eq $insertBool(0,B1,B2 LB) = B1 LB .
     eq $insertBool(s I1,B1,B2 LB) = B2 $insertBool(I1,B1,LB) .
-
-
 endm
