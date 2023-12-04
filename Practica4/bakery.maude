@@ -28,7 +28,7 @@ mod BAKERY++{P :: NAT*} is
             
             ---- compare your number with the number of the others
             j[N] := 0 ;
-            while (k > (j[N])) {
+            while (k >' (j[N])) {
                 if j[N] != N { 
                     ---- wait until process N takes its number
                     while (entering[j[N]] = true) { 
@@ -38,23 +38,23 @@ mod BAKERY++{P :: NAT*} is
                     bigger[N] := true ;
                     while (bigger[N] = true) {
                         if (number[j[N]] = 0) {
-                            bigger[N] := false ;
+                            bigger[N] := false 
                         } else{
-                            if ((number[j[N]]) > (number[N])) {
-                                bigger[N] := false ;
+                            if ((number[j[N]]) >' (number[N])) {
+                                bigger[N] := false
                             } else{
-                                if (((number[j[N]]) = (number[N])) & ((j[N]) > N)) {
-                                      bigger[N] := false ;
-                                };
-                           };
-                       };
-                   };
+                                if (((number[j[N]]) = (number[N])) & ((j[N]) >' N)) {
+                                      bigger[N] := false 
+                                }
+                           }
+                       }
+                   }
                 } ;
-                j[N] := (j[N]) + 1 ;
+                j[N] := (j[N]) + 1 
             } ;
             crit ;
             number[N] := 0 ;
-            rem ;
+            rem 
     }    .
 
     op initial : -> MachineState .
