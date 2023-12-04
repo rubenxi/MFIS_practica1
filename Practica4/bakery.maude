@@ -21,6 +21,7 @@ mod BAKERY++{P :: NAT*} is
 
     
     eq p(N) = repeat{ ---- get a number
+    eq p(N) = repeat{ ---- get a number
             entering[N] := true ;
             last := last + 1 ;
             number[N] := last ;
