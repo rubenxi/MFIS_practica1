@@ -12,7 +12,6 @@ mod BAKERY++{P :: NAT*} is
     op p : Nat -> Program .
     ops last number j : -> IntVar .
     ops entering bigger : -> BoolVar .
-    op n : -> Nat .
 
     var  M : Memory .
     vars P1 P2 : Program .
@@ -21,9 +20,7 @@ mod BAKERY++{P :: NAT*} is
     var  N N1 N2 : Nat .
 
     
-    eq p(N) =
-        n := 3 ; 
-        repeat{ ---- get a number
+    eq p(N) = repeat{ ---- get a number
             entering[N] := true ;
             last := last + 1 ;
             number[N] := last ;
@@ -58,7 +55,7 @@ mod BAKERY++{P :: NAT*} is
             crit ;
             number[N] := 0 ;
             rem 
-    } until (n >' (j[N])) .
+    }    .
 
     op initial : -> MachineState .
     op processes : Nat -> Soup .
