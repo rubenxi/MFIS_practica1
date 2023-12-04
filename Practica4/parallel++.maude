@@ -14,6 +14,7 @@ fmod BOOLVAR is
 endfm
 
 fmod MEMORY++ is
+    protecting INT .
     pr BOOLVAR .
     pr INTVAR .
     sorts Memory Bool? .
@@ -66,14 +67,14 @@ fmod EXPRESSION++ is
     eq eval(IVar, [IVar, LI] M) = LI .
     eq eval(IVar, M) = 0 [owise] .
 
-    op _+_ : IntExpression IntExpression -> IntExpression [ctor] .
-    eq eval(E +' E', M) = eval(E, M) +' eval(E', M) .
+    op _+'_ : IntExpression IntExpression -> IntExpression [ctor] .
+    eq eval(E +' E', M) = eval(E, M) + eval(E', M) .
 
-    op _*_ : IntExpression IntExpression -> IntExpression [ctor] .
-    eq eval(E *' E', M) = eval(E, M) *' eval(E', M) .
+    op _*'_ : IntExpression IntExpression -> IntExpression [ctor] .
+    eq eval(E *' E', M) = eval(E, M) * eval(E', M) .
     
-    op _-_ : IntExpression IntExpression -> IntExpression [ctor] .
-    eq eval(E -' E', M) = eval(E, M) + (-' eval(E', M)) .
+    op _-'_ : IntExpression IntExpression -> IntExpression [ctor] .
+    eq eval(E -' E', M) = eval(E, M) + (- eval(E', M)) .
 
     op _[_] : IntExpression IntExpression -> IntExpression [ctor] .
     eq eval(IVar[E], [IVar, LI] M) = eval($getInt(eval(E, [IVar, LI] M), LI) , [IVar, LI] M) .
@@ -120,7 +121,7 @@ fmod TESTS++ is
     op _=_ : IntExpression IntExpression -> Test .
     op _=_ : BoolExpression BoolExpression -> Test .
 
-    op _>_ : IntExpression IntExpression -> Test .
+    op _>'_ : IntExpression IntExpression -> Test .
 
     op _!=_ : IntExpression IntExpression -> Test .
     op _!=_ : BoolExpression BoolExpression -> Test .
@@ -169,7 +170,6 @@ fmod SEQUENTIAL++ is
 
     op if_{_} : Test Program -> Program [ctor] .
     op if_{_}else{_} : Test Program Program -> Program [ctor] .
-    op if_then_else_ : Test Program Program -> Program [ctor] .
     op while_{_} : Test Program -> Program [ctor] .
     op repeat{_} : Program -> Program [ctor] .
     op repeat{_}until_ : Program Test -> Program [ctor] .

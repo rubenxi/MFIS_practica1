@@ -1,8 +1,7 @@
 load parallel++.maude
 
 fth NAT* is 
-  pr NAT * (op _>_ to _>'_, op _+_ to _+'_, 
-                    op _*_ to _*'_, op _-_ to _-'_) .
+  pr NAT .
   op k : -> NzNat .
 endfth
 
@@ -20,9 +19,8 @@ mod BAKERY++{P :: NAT*} is
     var  I : Pid .
     var  N N1 N2 : Nat .
 
-    eq p(N) 
-      = repeat {
-            ---- get a number
+    
+    eq p(N) = repeat{ ---- get a number
             entering[N] := true ;
             last := last + 1 ;
             number[N] := last ;
@@ -30,35 +28,25 @@ mod BAKERY++{P :: NAT*} is
             
             ---- compare your number with the number of the others
             j[N] := 0 ;
-            while k > (j[N]) {
-                if j[N] != N { 
+            while (k > (j[N])) {
+                if ((j[N]) != N) { 
                     ---- wait until process N takes its number
-                    while entering[j[N]] = true { 
+                    while ((entering[j[N]]) = true) { 
                         skip
                     } ;
                     ---- wait until j[N] is 0, has a greater number, or the same if j[N] is equal to N
                     bigger[N] := true ;
-                    while bigger[N] = true {
-                        if number[j[N]] = 0 {
-                            bigger[N] := false 
-                        } else {
-                            if (number[j[N]]) > (number[N]) {
-                                bigger[N] := false 
-                            } else {
-                                if ((number[j[N]]) = (number[N])) & ((j[N]) > N) {
-                                    bigger[N] := false 
-                                }
-                            }
-                        }
-                    }
+                    while (bigger[N] = true) {
+                       skip
+                    } 
                 } ;
-                j[N] := (j[N]) + 1  
+                j[N] := (j[N]) + 1
             } ;
+
             crit ;
             number[N] := 0 ;
             rem 
-        } 
-        .
+    }    .
 
     op initial : -> MachineState .
     op processes : Nat -> Soup .
@@ -74,8 +62,7 @@ mod BAKERY++{P :: NAT*} is
     eq bools(s N) = false bools(N) .
 endm
 
-view 3 from NAT* to NAT * (op _>_ to _>'_, op _+_ to _+'_, 
-                           op _*_ to _*'_, op _-_ to _-'_) is 
+view 3 from NAT* to NAT is 
   op k to term 3 .
 endv
 
