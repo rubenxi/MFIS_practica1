@@ -1,0 +1,116 @@
+load time.maude .
+load model-checker.maude .
+
+fmod ID is
+    inc STRING .
+    sort Id .
+    op id :  String -> Id [ctor] .
+endfm
+
+fmod GATEWAY is
+    sort Gateway .
+    op exclusive : -> Gateway [ctor] .
+    op parallel : -> Gateway [ctor] .
+endfm
+
+mod NODE is
+    inc ID .
+    inc GATEWAY .
+    inc STRING .
+    inc SET{Id} .
+    inc BAG{Id} .
+
+    sort Node .
+
+    op node : Id -> Node [ctor] .
+    op start : Id Id -> Node [ctor] .
+    op end : Id Id -> Node [ctor] .
+
+    --- Id de la tarea
+    --- Descripcion tarea
+    --- Id flujo de entrada
+    --- Id flujo de salida
+    --- Duracion de la tarea
+    --- Conjunto de Ids que necesita la tarea
+    op task : Id String Id Id Time Bag{Id} -> Node [ctor] .
+    op split : Id Gateway Id Set{Id} -> Node [ctor] .
+    op merge : Id Gateway Set{Id} Id -> Node [ctor] .
+    
+endm
+
+fmod RESOURCE is
+    inc ID .
+    inc NAT .
+    sort Resource .
+    op resource : Id Nat Nat -> Resource [ctor] .
+endfm
+
+fmod FLOW is
+    inc ID .
+    inc TIME .
+    sort Flow .
+    op flow : Id Time -> Flow [ctor] .
+endfm
+
+fmod TOKEN is
+    inc ID .
+    inc TIME .
+    sort Token .
+    
+    op token : Id Time -> Token [ctor] .
+endfm
+
+omod BPMN-SEM is
+    inc ID .
+    inc GATEWAY .
+    inc NODE .
+    inc RESOURCE .
+    inc FLOW .
+    inc TOKEN .
+    inc BAG{Id} .
+    pr NAT .
+    pr SET{Id} .
+    pr SET{Node} .
+    pr SET{Resource} .
+    pr SET{Flow} .
+    pr SET{Token} .
+  
+    
+
+    class Process | nodes : Set{Node}, flows : Set{Flow}, tokens : Set{Token}, resources : Set{Resource} .
+endom
+
+mod BAG{X :: TRIV} is
+
+    sorts Bag{X} NeBag{X} Fid Fids .
+    subsort NeBag{X} < Bag{X} .
+    var bag : Bag{X} .
+    vars x y : X$Elt .
+    op empty-bag : -> Bag{X} [ctor] .
+    op _;_ : Bag{X} Bag{X} -> Bag{X} [ctor assoc comm id: empty-bag] .
+    op _;_ : X$Elt Bag{X} -> NeBag{X} [ctor assoc comm id: empty-bag] .
+
+    eq empty-bag ; bag = bag .
+    eq x ; empty-bag = x .
+    
+        
+endm
+
+view Id from TRIV to ID is  
+    sort Elt to Id .
+endv
+view Token from TRIV to TOKEN is  
+    sort Elt to Token .
+endv
+view Node from TRIV to NODE is  
+    sort Elt to Node .
+endv
+view Resource from TRIV to RESOURCE is  
+    sort Elt to Resource .
+endv
+view Flow from TRIV to FLOW is  
+    sort Elt to Flow .
+endv
+view Gateway from TRIV to GATEWAY is
+    sort Elt to Gateway .
+endv
