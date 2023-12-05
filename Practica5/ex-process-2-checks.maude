@@ -1,0 +1,5 @@
+sload ex-process-2.maude 
+
+search [2] {PROCESS,0} =>* {< o : Process | tokens: empty, Atts:AttributeSet >,T:Time} .
+search [,1000] {PROCESS,0} =>! {< o : Process | tokens: Tks:Set{Token}, Atts:AttributeSet >, T:Time} such that Tks:Set{Token} =/= empty .
+

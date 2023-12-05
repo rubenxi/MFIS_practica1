@@ -1,0 +1,31 @@
+sload ../spec/bpmn.maude 
+---- bpmn.maude is the name of the file in which the BPMN-SEM module is defined. 
+
+mod BPMN-EX is
+  pr BPMN-SEM . ---- module with the semantics of BPMN
+
+  op o : -> Oid .
+  op PROCESS : -> Object .
+  eq PROCESS 
+    = < o : Process | 
+        nodes : (start(id("n1"), id("f1")),
+                split(id("n2"), parallel, id("f1"), (id("f2"), id("f3"), id("f4"))),
+                task(id("n3"), "t1", id("f2"), id("f5"), 30, (id("circle"); id("triangle"))),
+                task(id("n4"), "t2", id("f3"), id("f6"), 40, (id("diamond"); id("triangle"))),
+                task(id("n5"), "t3", id("f4"), id("f7"), 50, (id("diamond"); id("circle"))),
+                merge(id("n6"), parallel, (id("f5"), id("f6"), id("f7")), id("f8")),
+                end(id("n7"), id("f8"))), 
+        flows : (flow(id("f1"), 3),
+                flow(id("f2"), 4),
+                flow(id("f3"), 5),
+                flow(id("f4"), 6),
+                flow(id("f5"), 7),
+                flow(id("f6"), 8),
+                flow(id("f7"), 9),
+                flow(id("f8"), 3)),
+        tokens : token(id("n1"), 0),
+        resources : resource(id("circle"), 1, 1), 
+                    resource(id("triangle"), 1, 1), 
+                    resource(id("diamond"), 1, 1) > .
+endm
+
