@@ -1,17 +1,17 @@
 load time.maude .
 load model-checker.maude .
 
-fmod ID is
+mod ID is
     inc STRING .
     sort Id .
     op id :  String -> Id [ctor] .
-endfm
+endm
 
-fmod GATEWAY is
+mod GATEWAY is
     sort Gateway .
     op exclusive : -> Gateway [ctor] .
     op parallel : -> Gateway [ctor] .
-endfm
+endm
 
 mod NODE is
     inc ID .
@@ -19,7 +19,7 @@ mod NODE is
     inc STRING .
     inc SET{Id} .
     inc BAG{Id} .
-
+    inc POSRAT-TIME-DOMAIN-WITH-INF  .
     sort Node .
 
     op node : Id -> Node [ctor] .
@@ -38,29 +38,30 @@ mod NODE is
     
 endm
 
-fmod RESOURCE is
+mod RESOURCE is
     inc ID .
     inc NAT .
     sort Resource .
     op resource : Id Nat Nat -> Resource [ctor] .
-endfm
+endm
 
-fmod FLOW is
+mod FLOW is
     inc ID .
-    inc TIME .
+    inc POSRAT-TIME-DOMAIN-WITH-INF  .
     sort Flow .
     op flow : Id Time -> Flow [ctor] .
-endfm
+endm
 
-fmod TOKEN is
+mod TOKEN is
     inc ID .
-    inc TIME .
+    inc POSRAT-TIME-DOMAIN-WITH-INF  .
     sort Token .
     
     op token : Id Time -> Token [ctor] .
-endfm
+endm
 
-omod BPMN-SEM is
+omod BPMN is
+    
     inc ID .
     inc GATEWAY .
     inc NODE .
@@ -68,30 +69,48 @@ omod BPMN-SEM is
     inc FLOW .
     inc TOKEN .
     inc BAG{Id} .
+    inc POSRAT-TIME-DOMAIN-WITH-INF .
     pr NAT .
     pr SET{Id} .
     pr SET{Node} .
     pr SET{Resource} .
     pr SET{Flow} .
     pr SET{Token} .
-  
-    
+
+    var SN : Set{Node} .
+    var SF : Set{Flow} .
+    var ST : Set{Token} .
+    var SR : Set{Resource} .
+    vars Ti Ti' : TimeInf .
+    vars T T' : Time .
+    var id : Id .
 
     class Process | nodes : Set{Node}, flows : Set{Flow}, tokens : Set{Token}, resources : Set{Resource} .
+ 
+    sorts System .
+    op {_,_} : Configuration Time -> System . 
+
+    op tokenTimeSub : Set{Token} Time -> Set{Token} .
+    eq tokenTimeSub(empty, T) = empty .
+    eq tokenTimeSub(token(id, Ti), T) = token(id, Ti monus T) .
+    eq tokenTimeSub((token(id,Ti), ST), T) = (token(id,(Ti monus T)), tokenTimeSub(ST , T)) .
+
+    ---rl[tick] : 
+    ---rl[start] :
+    
 endom
 
 mod BAG{X :: TRIV} is
 
     sorts Bag{X} NeBag{X} Fid Fids .
     subsort NeBag{X} < Bag{X} .
-    var bag : Bag{X} .
-    vars x y : X$Elt .
+    var bag bag' : Bag{X} .
+    vars x : X$Elt .
     op empty-bag : -> Bag{X} [ctor] .
+    op {_} : X$Elt -> Bag{X} .
     op _;_ : Bag{X} Bag{X} -> Bag{X} [ctor assoc comm id: empty-bag] .
-    op _;_ : X$Elt Bag{X} -> NeBag{X} [ctor assoc comm id: empty-bag] .
 
     eq empty-bag ; bag = bag .
-    eq x ; empty-bag = x .
     
         
 endm
